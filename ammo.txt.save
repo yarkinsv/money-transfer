@@ -1,0 +1,6 @@
+[Content-Type: application/json]
+ 
+PUT /user/create HTTP/1.0
+Content-Length: 60
+
+{"userName": "yangluo1","emailAddress": "currenc@emal.com"}

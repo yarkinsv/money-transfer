@@ -1,0 +1,45 @@
+/.idea
+*.iml
+
+/api/.idea
+/client/.idea
+/server/.idea
+
+*.log
+/server/logs
+logs
+
+nb-configuration.xml
+nbactions.xml
+nbproject
+
+#debian build
+debian/files
+debian/hh-negotiations*
+debian/stamp-makefile-*
+
+target
+.classpath
+.project
+.settings
+bin
+
+atlassian-ide-plugin.xml
+rebel.xml
+/server/swagger/generated/api-preview.md
+/server/doc/api-preview.md
+/server/src/etc/hh-negotiations/settings.properties
+
+# macOS junk
+.AppleDouble
+.DS_Store
+Icon?
+.Spotlight-V100
+.Trashes
+
+# Windows junk
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+*.class
