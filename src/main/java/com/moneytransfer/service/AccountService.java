@@ -4,8 +4,7 @@ import com.moneytransfer.dao.DAOFactory;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.Account;
 import com.moneytransfer.model.MoneyUtil;
-
-import java.util.stream.Collectors;
+import com.moneytransfer.utils.Utils;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
@@ -14,6 +13,7 @@ import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Account Service
@@ -23,7 +23,7 @@ import java.util.Set;
 @Consumes(MediaType.APPLICATION_JSON)
 public class AccountService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(Utils.getStringProperty("dao_implementation"));
 
   private static Logger log = Logger.getLogger(AccountService.class);
 

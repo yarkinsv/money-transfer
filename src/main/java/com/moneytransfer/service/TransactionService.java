@@ -1,5 +1,11 @@
 package com.moneytransfer.service;
 
+import com.moneytransfer.dao.DAOFactory;
+import com.moneytransfer.exception.CustomException;
+import com.moneytransfer.model.MoneyUtil;
+import com.moneytransfer.model.UserTransaction;
+import com.moneytransfer.utils.Utils;
+
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -7,16 +13,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.moneytransfer.dao.DAOFactory;
-import com.moneytransfer.exception.CustomException;
-import com.moneytransfer.model.MoneyUtil;
-import com.moneytransfer.model.UserTransaction;
-
 @Path("/transaction")
 @Produces(MediaType.APPLICATION_JSON)
 public class TransactionService {
 
-	private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+	private final DAOFactory daoFactory = DAOFactory.getDAOFactory(Utils.getStringProperty("dao_implementation"));
 	
 	/**
 	 * Transfer fund between two accounts.
