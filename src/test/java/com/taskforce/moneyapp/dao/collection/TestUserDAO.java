@@ -1,4 +1,4 @@
-package com.taskforce.moneyapp.dao;
+package com.taskforce.moneyapp.dao.collection;
 
 import com.moneytransfer.dao.DAOFactory;
 import com.moneytransfer.exception.CustomException;
@@ -6,14 +6,12 @@ import com.moneytransfer.model.User;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
 
 import static junit.framework.TestCase.*;
 
-@Ignore("not implemented yet")
 public class TestUserDAO {
 
     private static Logger log = Logger.getLogger(TestUserDAO.class);

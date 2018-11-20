@@ -3,7 +3,6 @@ package com.taskforce.moneyapp.dao.h2;
 import com.moneytransfer.dao.DAOFactory;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.Account;
-
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
