@@ -1,104 +1,163 @@
 package com.taskforce.moneyapp.dao;
 
+import com.moneytransfer.dao.AccountDAO;
 import com.moneytransfer.dao.DAOFactory;
+import com.moneytransfer.dao.H2DAOFactory;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.Account;
-
+import com.moneytransfer.model.UserTransaction;
+import org.apache.commons.dbutils.DbUtils;
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
-import java.util.Set;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.concurrent.CountDownLatch;
 
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.assertEquals;
 
+@Ignore("not implemented yet")
 public class TestAccountDAO {
 
-	private static final DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+    private static Logger log = Logger.getLogger(TestAccountDAO.class);
+    private static final DAOFactory collectionDaoFactory = DAOFactory.getDAOFactory(DAOFactory.COLLECTION);
+    private static final int THREADS_COUNT = 100;
 
-	@BeforeClass
-	public static void setup() throws CustomException {
-		// prepare test database and test data. Test data are initialised from
-		// src/test/resources/demo.sql
-		h2DaoFactory.populateTestData();
-	}
+    @BeforeClass
+    public static void setup() throws CustomException {
+        // prepare test database and test data, Test data are hard coded
+        collectionDaoFactory.populateTestData();
+    }
 
-	@After
-	public void tearDown() {
+    @After
+    public void tearDown() {
 
-	}
+    }
 
-	@Test
-	public void testGetAllAccounts() throws CustomException {
-		Set<Account> allAccounts = h2DaoFactory.getAccountDAO().getAllAccounts();
-		assertTrue(allAccounts.size() > 1);
-	}
+    @Test
+    public void testAccountSingleThreadSameCcyTransfer() throws CustomException {
 
-	@Test
-	public void testGetAccountById() throws CustomException {
-		Account account = h2DaoFactory.getAccountDAO().getAccountById(1L);
-		assertTrue(account.getUserName().equals("yangluo"));
-	}
+        final AccountDAO accountDAO = collectionDaoFactory.getAccountDAO();
 
-	@Test
-	public void testGetNonExistingAccById() throws CustomException {
-		Account account = h2DaoFactory.getAccountDAO().getAccountById(100L);
-		assertTrue(account == null);
-	}
+        BigDecimal transferAmount = new BigDecimal(50.01234).setScale(4, RoundingMode.HALF_EVEN);
 
-	@Test
-	public void testCreateAccount() throws CustomException {
-		BigDecimal balance = new BigDecimal(10).setScale(4, RoundingMode.HALF_EVEN);
-		Account a = new Account("test2", balance, "CNY");
-		long aid = h2DaoFactory.getAccountDAO().createAccount(a);
-		Account afterCreation = h2DaoFactory.getAccountDAO().getAccountById(aid);
-		assertTrue(afterCreation.getUserName().equals("test2"));
-		assertTrue(afterCreation.getCurrencyCode().equals("CNY"));
-		assertTrue(afterCreation.getBalance().equals(balance));
-	}
+        UserTransaction transaction = new UserTransaction("EUR", transferAmount, 3L, 4L);
 
-	@Test
-	public void testDeleteAccount() throws CustomException {
-		int rowCount = h2DaoFactory.getAccountDAO().deleteAccountById(2L);
-		// assert one row(user) deleted
-		assertTrue(rowCount == 1);
-		// assert user no longer there
-		assertTrue(h2DaoFactory.getAccountDAO().getAccountById(2L) == null);
-	}
+        long startTime = System.currentTimeMillis();
 
-	@Test
-	public void testDeleteNonExistingAccount() throws CustomException {
-		int rowCount = h2DaoFactory.getAccountDAO().deleteAccountById(500L);
-		// assert no row(user) deleted
-		assertTrue(rowCount == 0);
+        accountDAO.transferAccountBalance(transaction);
+        long endTime = System.currentTimeMillis();
 
-	}
+        log.info("TransferAccountBalance finished, time taken: " + (endTime - startTime) + "ms");
 
-	@Test
-	public void testUpdateAccountBalanceSufficientFund() throws CustomException {
+        Account accountFrom = accountDAO.getAccountById(3);
 
-		BigDecimal deltaDeposit = new BigDecimal(50).setScale(4, RoundingMode.HALF_EVEN);
-		BigDecimal afterDeposit = new BigDecimal(150).setScale(4, RoundingMode.HALF_EVEN);
-		int rowsUpdated = h2DaoFactory.getAccountDAO().updateAccountBalance(1L, deltaDeposit);
-		assertTrue(rowsUpdated == 1);
-		assertTrue(h2DaoFactory.getAccountDAO().getAccountById(1L).getBalance().equals(afterDeposit));
-		BigDecimal deltaWithDraw = new BigDecimal(-50).setScale(4, RoundingMode.HALF_EVEN);
-		BigDecimal afterWithDraw = new BigDecimal(100).setScale(4, RoundingMode.HALF_EVEN);
-		int rowsUpdatedW = h2DaoFactory.getAccountDAO().updateAccountBalance(1L, deltaWithDraw);
-		assertTrue(rowsUpdatedW == 1);
-		assertTrue(h2DaoFactory.getAccountDAO().getAccountById(1L).getBalance().equals(afterWithDraw));
+        Account accountTo = accountDAO.getAccountById(4);
 
-	}
+        log.debug("Account From: " + accountFrom);
 
-	@Test(expected = CustomException.class)
-	public void testUpdateAccountBalanceNotEnoughFund() throws CustomException {
-		BigDecimal deltaWithDraw = new BigDecimal(-50000).setScale(4, RoundingMode.HALF_EVEN);
-		int rowsUpdatedW = h2DaoFactory.getAccountDAO().updateAccountBalance(1L, deltaWithDraw);
-		assertTrue(rowsUpdatedW == 0);
+        log.debug("Account From: " + accountTo);
 
-	}
+        assertEquals(0, accountFrom.getBalance().compareTo(new BigDecimal(449.9877).setScale(4, RoundingMode.HALF_EVEN)));
+        assertEquals(accountTo.getBalance(), new BigDecimal(550.0123).setScale(4, RoundingMode.HALF_EVEN));
+
+    }
+
+    @Test
+    public void testAccountMultiThreadedTransfer() throws InterruptedException, CustomException {
+        final AccountDAO accountDAO = collectionDaoFactory.getAccountDAO();
+        // transfer a total of 200USD from 100USD balance in multi-threaded
+        // mode, expect half of the transaction fail
+        final CountDownLatch latch = new CountDownLatch(THREADS_COUNT);
+        for (int i = 0; i < THREADS_COUNT; i++) {
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        UserTransaction transaction = new UserTransaction("USD",
+                                new BigDecimal(2).setScale(4, RoundingMode.HALF_EVEN), 1L, 2L);
+                        accountDAO.transferAccountBalance(transaction);
+                    } catch (Exception e) {
+                        log.error("Error occurred during transfer ", e);
+                    } finally {
+                        latch.countDown();
+                    }
+                }
+            }).start();
+        }
+
+        latch.await();
+
+        Account accountFrom = accountDAO.getAccountById(1);
+
+        Account accountTo = accountDAO.getAccountById(2);
+
+        log.debug("Account From: " + accountFrom);
+
+        log.debug("Account From: " + accountTo);
+
+        assertEquals(accountFrom.getBalance(), new BigDecimal(0).setScale(4, RoundingMode.HALF_EVEN));
+        assertEquals(accountTo.getBalance(), new BigDecimal(300).setScale(4, RoundingMode.HALF_EVEN));
+
+    }
+
+    @Test
+    public void testTransferFailOnDBLock() throws CustomException, SQLException {
+        final String SQL_LOCK_ACC = "SELECT * FROM Account WHERE AccountId = 5 FOR UPDATE";
+        Connection conn = null;
+        PreparedStatement lockStmt = null;
+        ResultSet rs = null;
+        Account fromAccount = null;
+
+        try {
+            conn = H2DAOFactory.getConnection();
+            conn.setAutoCommit(false);
+            // lock account for writing:
+            lockStmt = conn.prepareStatement(SQL_LOCK_ACC);
+            rs = lockStmt.executeQuery();
+            if (rs.next()) {
+                fromAccount = new Account(rs.getLong("AccountId"), rs.getString("UserName"),
+                        rs.getBigDecimal("Balance"), rs.getString("CurrencyCode"));
+                if (log.isDebugEnabled())
+                    log.debug("Locked Account: " + fromAccount);
+            }
+
+            if (fromAccount == null) {
+                throw new CustomException("Locking error during test, SQL = " + SQL_LOCK_ACC);
+            }
+            // after lock account 5, try to transfer from account 6 to 5
+            // default h2 timeout for acquire lock is 1sec
+            BigDecimal transferAmount = new BigDecimal(50).setScale(4, RoundingMode.HALF_EVEN);
+
+            UserTransaction transaction = new UserTransaction("GBP", transferAmount, 6L, 5L);
+            collectionDaoFactory.getAccountDAO().transferAccountBalance(transaction);
+            conn.commit();
+        } catch (Exception e) {
+            log.error("Exception occurred, initiate a rollback");
+            try {
+                if (conn != null)
+                    conn.rollback();
+            } catch (SQLException re) {
+                log.error("Fail to rollback transaction", re);
+            }
+        } finally {
+            DbUtils.closeQuietly(conn);
+            DbUtils.closeQuietly(rs);
+            DbUtils.closeQuietly(lockStmt);
+        }
+
+        // now inspect account 3 and 4 to verify no transaction occurred
+        BigDecimal originalBalance = new BigDecimal(500).setScale(4, RoundingMode.HALF_EVEN);
+        assertEquals(collectionDaoFactory.getAccountDAO().getAccountById(6).getBalance(), originalBalance);
+        assertEquals(collectionDaoFactory.getAccountDAO().getAccountById(5).getBalance(), originalBalance);
+    }
 
 }
