@@ -4,6 +4,7 @@ import com.moneytransfer.dao.DAOFactory;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.Account;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -16,8 +17,8 @@ import static junit.framework.TestCase.assertTrue;
 public class TestAccountDAO {
     private static final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.COLLECTION);
 
-    @BeforeClass
-    public static void setup() throws CustomException {
+    @Before
+    public void setup() throws CustomException {
         // prepare test database and test data. Test data are initialised from
         // src/test/resources/demo.sql
         daoFactory.populateTestData();

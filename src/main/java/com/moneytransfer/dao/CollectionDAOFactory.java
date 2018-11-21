@@ -24,6 +24,9 @@ public class CollectionDAOFactory extends DAOFactory {
 
     @Override
     public void populateTestData() throws CustomException {
+        ((UserDAOCollectionImpl) userDAO).clean();
+        ((AccountDAOCollectionImpl) accountDAO).clean();
+
         userDAO.insertUser(new User(1, "test2", "test2@gmail.com"));
         userDAO.insertUser(new User(2, "test1", "test1@gmail.com"));
         userDAO.insertUser(new User(3, "yangluo", "yangluo@gmail.com"));

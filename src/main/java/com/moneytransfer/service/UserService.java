@@ -26,8 +26,6 @@ public class UserService {
 
   private static Logger log = Logger.getLogger(UserService.class);
 
-  private List<User> allUsers = new ArrayList<>();
-
   /**
    * Find by userName
    *
@@ -57,7 +55,6 @@ public class UserService {
   @Path("/all")
   public Response getAllUsers() throws CustomException {
     List<User> users = daoFactory.getUserDAO().getAllUsers();
-    allUsers.addAll(users);
     return Response.ok("[" + users.stream().map(User::toString).collect(Collectors.joining(",")) + "]").build();
   }
 

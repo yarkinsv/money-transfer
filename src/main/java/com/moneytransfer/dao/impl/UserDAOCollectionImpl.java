@@ -102,4 +102,10 @@ public class UserDAOCollectionImpl implements UserDAO {
             lock.writeLock().unlock();
         }
     }
+
+    public void clean() {
+        currentId.set(0);
+        userIdByName.clear();
+        usersById.clear();
+    }
 }

@@ -97,8 +97,8 @@ public class TestAccountBalance {
 
         log.debug("Account From: " + accountTo);
 
-        assertEquals(accountFrom.getBalance(), new BigDecimal(0).setScale(4, RoundingMode.HALF_EVEN));
-        assertEquals(accountTo.getBalance(), new BigDecimal(300).setScale(4, RoundingMode.HALF_EVEN));
+        assertEquals(new BigDecimal(0).setScale(4, RoundingMode.HALF_EVEN), accountFrom.getBalance());
+        assertEquals(new BigDecimal(300).setScale(4, RoundingMode.HALF_EVEN), accountTo.getBalance());
 
     }
 }
