@@ -43,7 +43,7 @@ public class UserDAOImpl implements UserDAO {
         if (log.isDebugEnabled())
           log.debug("getAllUsers() Retrieve User: " + u);
       }
-      fetched.addAll(users);
+      //fetched.addAll(users);
       return users;
     } catch (SQLException e) {
       throw new CustomException("Error reading user data", e);
