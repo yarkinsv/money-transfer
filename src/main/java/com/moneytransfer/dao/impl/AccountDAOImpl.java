@@ -158,8 +158,8 @@ public class AccountDAOImpl implements AccountDAO {
     } catch (SQLException e) {
       throw new CustomException("deleteAccountById(): Error deleting user account Id " + accountId, e);
     } finally {
+      DbUtils.closeQuietly(stmt);      
       DbUtils.closeQuietly(conn);
-      DbUtils.closeQuietly(stmt);
     }
   }
 
@@ -216,10 +216,10 @@ public class AccountDAOImpl implements AccountDAO {
         throw new CustomException("Fail to rollback transaction", re);
       }
     } finally {
-      DbUtils.closeQuietly(conn);
       DbUtils.closeQuietly(rs);
       DbUtils.closeQuietly(lockStmt);
       DbUtils.closeQuietly(updateStmt);
+      DbUtils.closeQuietly(conn);
     }
     return updateCount;
   }
@@ -309,10 +309,10 @@ public class AccountDAOImpl implements AccountDAO {
         throw new CustomException("Fail to rollback transaction", re);
       }
     } finally {
-      DbUtils.closeQuietly(conn);
       DbUtils.closeQuietly(rs);
       DbUtils.closeQuietly(lockStmt);
       DbUtils.closeQuietly(updateStmt);
+      DbUtils.closeQuietly(conn);
     }
     return result;
   }
