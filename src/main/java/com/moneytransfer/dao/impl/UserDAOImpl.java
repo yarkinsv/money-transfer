@@ -137,7 +137,7 @@ public class UserDAOImpl implements UserDAO {
       log.error("Error Inserting User :" + user);
       throw new CustomException("Error creating user data", e);
     } finally {
-      DbUtils.closeQuietly(conn);
+      DbUtils.closeQuietly(conn, stmt, rs);
     }
 
   }
@@ -160,8 +160,8 @@ public class UserDAOImpl implements UserDAO {
       log.error("Error Updating User :" + user);
       throw new CustomException("Error update user data", e);
     } finally {
+      DbUtils.closeQuietly(stmt);      
       DbUtils.closeQuietly(conn);
-      DbUtils.closeQuietly(stmt);
     }
   }
 
@@ -181,8 +181,8 @@ public class UserDAOImpl implements UserDAO {
       log.error("Error Deleting User :" + userId);
       throw new CustomException("Error Deleting User ID:" + userId, e);
     } finally {
-      DbUtils.closeQuietly(conn);
       DbUtils.closeQuietly(stmt);
+      DbUtils.closeQuietly(conn);
     }
   }
 }
