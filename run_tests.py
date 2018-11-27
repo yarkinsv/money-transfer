@@ -51,8 +51,8 @@ def find_account(user_name):
 
 
 def create_new_user(user_name, email):
-    return requests.post(url=host + 'user/create', json={'userName': user_name, 'emailAddress': email}, headers={'Connection':'close'}).json()
-
+    result = requests.post(url=host + 'user/create', json={'userName': user_name, 'emailAddress': email}, headers={'Connection':'close'})
+    return result.json()
 
 def create_new_account(user_name, balance):
     return requests.post(url=host + 'account/create', json={'userName': user_name, 'balance': balance, 'currencyCode': 'USD'}, headers={'Connection':'close'}).json()
@@ -90,14 +90,27 @@ def play_scenario_1(user_name):
     deposit_money(acc['accountId'], 200)
     transfer(250, acc['accountId'], find_account('yangluo')['accountId'])
     withdraw_money(acc['accountId'], 50)
+    #delete_account(acc['accountId'])
     print()
     print('users: ' + str(len(get_all_users())))
     print('accounts: ' + str(len(get_accounts())))
     print('yangluo money: ' + str(find_account('yangluo')['balance']))
 
 
-for i in range(1000000):
-    play_scenario_1("Mikel" + str(i))
-    print_prof_data()
+def test_play_scenario_1():
+    for i in range(1000000):
+        # print(get_user_image())
+        play_scenario_1("Mikel" + str(i))
+        print_prof_data()
+
+def test_get_user_image():
+    for i in range(1000000):
+        # print(get_user_image())
+        get_user_image()
+        print_prof_data()
 
 
+
+if __name__ == '__main__':
+    test_play_scenario_1()
+    #test_get_user_image() 

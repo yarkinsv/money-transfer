@@ -32,6 +32,7 @@ public class Application {
 		startService();
 	}
 
+
 	private static void startService() throws Exception {
 		Server server = new Server(new QueuedThreadPool(6, 1));
 		ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory());
