@@ -4,7 +4,6 @@ import com.moneytransfer.dao.impl.AccountDAOImpl;
 import com.moneytransfer.dao.impl.UserDAOImpl;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.utils.Utils;
-
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.log4j.Logger;
 import org.h2.tools.RunScript;
@@ -38,13 +37,11 @@ public class H2DAOFactory extends DAOFactory {
 	}
 
 	public UserDAO getUserDAO() {
-		DbUtils.loadDriver(h2_driver);
-		return new UserDAOImpl();
+		return userDAO;
 	}
 
 	public AccountDAO getAccountDAO() {
-		DbUtils.loadDriver(h2_driver);
-		return new AccountDAOImpl();
+		return accountDAO;
 	}
 
 	@Override

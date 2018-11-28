@@ -3,6 +3,12 @@ package com.moneytransfer.service;
 import com.moneytransfer.dao.DAOFactory;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.User;
+import com.moneytransfer.utils.Utils;
+import org.apache.log4j.Logger;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -11,27 +17,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import org.apache.log4j.Logger;
 
 @Path("/user")
 @Produces(MediaType.APPLICATION_JSON)
 public class UserService {
+  private static final Logger log = Logger.getLogger(UserService.class);
+  private static final Pattern emailPattern = Pattern.compile("(?=.{1,250}$)(.+)@(.+){2,}\\.(.+){2,}");
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
-
-  private static Logger log = Logger.getLogger(UserService.class);
-
-  private List<User> allUsers = new ArrayList<>();
+  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(Utils.getStringProperty("daoImplementation"));
 
   /**
    * Find by userName
@@ -62,7 +55,6 @@ public class UserService {
   @Path("/all")
   public Response getAllUsers() throws CustomException {
     List<User> users = daoFactory.getUserDAO().getAllUsers();
-    allUsers.addAll(users);
     return Response.ok("[" + users.stream().map(User::toString).collect(Collectors.joining(",")) + "]").build();
   }
 
@@ -76,7 +68,7 @@ public class UserService {
   @POST
   @Path("/create")
   public User createUser(User user) throws CustomException {
-    Matcher matcher = Pattern.compile("(?=.{1,250}$)(.+)@(.+){2,}\\.(.+){2,}").matcher(user.getEmailAddress());
+    Matcher matcher = emailPattern.matcher(user.getEmailAddress());
     if (!matcher.find()) {
       throw new WebApplicationException("User email is in wrong pattern", Response.Status.BAD_REQUEST);
     }

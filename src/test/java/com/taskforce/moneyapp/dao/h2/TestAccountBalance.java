@@ -1,4 +1,4 @@
-package com.taskforce.moneyapp.dao;
+package com.taskforce.moneyapp.dao.h2;
 
 import com.moneytransfer.dao.AccountDAO;
 import com.moneytransfer.dao.DAOFactory;
@@ -6,7 +6,6 @@ import com.moneytransfer.dao.H2DAOFactory;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.Account;
 import com.moneytransfer.model.UserTransaction;
-
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -111,7 +110,7 @@ public class TestAccountBalance {
 	}
 
 	@Test
-	public void testTransferFailOnDBLock() throws CustomException, SQLException {
+	public void testTransferFailOnDBLock() throws CustomException {
 		final String SQL_LOCK_ACC = "SELECT * FROM Account WHERE AccountId = 5 FOR UPDATE";
 		Connection conn = null;
 		PreparedStatement lockStmt = null;

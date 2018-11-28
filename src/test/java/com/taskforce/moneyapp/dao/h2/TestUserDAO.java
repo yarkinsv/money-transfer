@@ -1,9 +1,8 @@
-package com.taskforce.moneyapp.dao;
+package com.taskforce.moneyapp.dao.h2;
 
 import com.moneytransfer.dao.DAOFactory;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.User;
-
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.BeforeClass;
