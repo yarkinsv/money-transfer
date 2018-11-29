@@ -11,7 +11,6 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.Set;
 
 import static junit.framework.TestCase.assertTrue;
 
@@ -33,7 +32,7 @@ public class TestAccountDAO {
 
 	@Test
 	public void testGetAllAccounts() throws CustomException {
-		Set<Account> allAccounts = h2DaoFactory.getAccountDAO().getAllAccounts();
+		List<Account> allAccounts = h2DaoFactory.getAccountDAO().getAllAccounts();
 		assertTrue(allAccounts.size() > 1);
 	}
 

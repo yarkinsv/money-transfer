@@ -5,11 +5,11 @@ import com.moneytransfer.model.Account;
 import com.moneytransfer.model.UserTransaction;
 
 import java.math.BigDecimal;
-import java.util.Set;
+import java.util.List;
 
 public interface AccountDAO {
 
-  Set<Account> getAllAccounts() throws CustomException;
+  List<Account> getAllAccounts() throws CustomException;
 
   Account getAccountById(long accountId) throws CustomException;
 
