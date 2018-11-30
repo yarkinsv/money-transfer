@@ -11,6 +11,7 @@ import org.apache.commons.dbutils.DbUtils;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -26,7 +27,7 @@ import static junit.framework.TestCase.assertTrue;
 public class TestAccountBalance {
 
 	private static Logger log = Logger.getLogger(TestAccountDAO.class);
-	private static final DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+	private static final DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.HM);
 	private static final int THREADS_COUNT = 100;
 
 	@BeforeClass
@@ -111,6 +112,7 @@ public class TestAccountBalance {
 	}
 
 	@Test
+    @Ignore
 	public void testTransferFailOnDBLock() throws CustomException, SQLException {
 		final String SQL_LOCK_ACC = "SELECT * FROM Account WHERE AccountId = 5 FOR UPDATE";
 		Connection conn = null;

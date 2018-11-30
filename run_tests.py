@@ -54,6 +54,9 @@ def create_new_user(user_name, email):
     result = requests.post(url=host + 'user/create', json={'userName': user_name, 'emailAddress': email}, headers={'Connection':'close'})
     return result.json()
 
+def delete_user(user_id):
+    return requests.delete(url=host +  'user/' + str(user_id))
+
 def create_new_account(user_name, balance):
     return requests.post(url=host + 'account/create', json={'userName': user_name, 'balance': balance, 'currencyCode': 'USD'}, headers={'Connection':'close'}).json()
 
@@ -110,7 +113,23 @@ def test_get_user_image():
         print_prof_data()
 
 
+@profile
+def my_user_test(user_name):
+    n = 10
+    for i in range(n):
+        result = create_new_user(user_name + str(i), user_name + str(i) + '@mail.com')
+        print(result)
+        print('users: ' + str(len(get_all_users())))
+    for i in range(n):
+        delete_user(i)
+    print('users: ' + str(len(get_all_users())))
+
+
+
+
 
 if __name__ == '__main__':
     test_play_scenario_1()
     #test_get_user_image() 
+    #my_user_test('vitali')
+

@@ -23,10 +23,10 @@ public class Application {
 	private static Logger log = Logger.getLogger(Application.class);
 
 	public static void main(String[] args) throws Exception {
-		// Initialize H2 database with demo data
 		log.info("Initialize demo .....");
-		DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
-		h2DaoFactory.populateTestData();
+		DAOFactory hmDaoFactory = DAOFactory.getDAOFactory(DAOFactory.HM);
+
+		hmDaoFactory.populateTestData();
 		log.info("Initialisation Complete....");
 		// Host service on jetty
 		startService();
