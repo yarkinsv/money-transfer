@@ -110,12 +110,13 @@ public class UserDAOImpl implements UserDAO {
   public long insertUser(User user) throws CustomException {
     Connection conn = null;
     PreparedStatement stmt = null;
+    PreparedStatement stmt_max_id = null;
     ResultSet rs = null;
     try {
       conn = H2DAOFactory.getConnection();
       conn.setAutoCommit(false);
-      stmt = conn.prepareStatement(SQL_GET_MAX_USER_ID);
-      rs = stmt.executeQuery();
+      stmt_max_id = conn.prepareStatement(SQL_GET_MAX_USER_ID);
+      rs = stmt_max_id.executeQuery();
       long id = 1;
       if (rs.next()) {
         id = rs.getLong("MaxUserId") + 1;
@@ -137,6 +138,7 @@ public class UserDAOImpl implements UserDAO {
       log.error("Error Inserting User :" + user);
       throw new CustomException("Error creating user data", e);
     } finally {
+      DbUtils.closeQuietly(stmt_max_id);
       DbUtils.closeQuietly(conn, stmt, rs);
     }
 

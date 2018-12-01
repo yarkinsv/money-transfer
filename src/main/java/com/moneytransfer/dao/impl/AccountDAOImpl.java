@@ -250,6 +250,10 @@ public class AccountDAOImpl implements AccountDAO {
           log.debug("transferAccountBalance from Account: " + fromAccount);
         }
       }
+      
+      DbUtils.closeQuietly(rs);
+      DbUtils.closeQuietly(lockStmt);
+      
       lockStmt = conn.prepareStatement(SQL_LOCK_ACC_BY_ID);
       lockStmt.setLong(1, userTransaction.getToAccountId());
       rs = lockStmt.executeQuery();
