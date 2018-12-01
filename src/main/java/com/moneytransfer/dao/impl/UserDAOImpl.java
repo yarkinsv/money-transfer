@@ -23,7 +23,7 @@ public class UserDAOImpl implements UserDAO {
   private final static String SQL_DELETE_USER_BY_ID = "DELETE FROM User WHERE UserId = ? ";
   private final static String SQL_GET_MAX_USER_ID = "SELECT MAX(UserID) AS MaxUserId FROM User";
   
-  private List<User> fetched = new ArrayList<>();
+  //private List<User> fetched = new ArrayList<>();
 
   /**
    * Find all users
