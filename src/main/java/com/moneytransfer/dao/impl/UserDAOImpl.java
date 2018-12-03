@@ -18,10 +18,10 @@ public class UserDAOImpl implements UserDAO {
   private final static String SQL_GET_USER_BY_ID = "SELECT * FROM User WHERE UserId = ? ";
   private final static String SQL_GET_ALL_USERS = "SELECT * FROM User";
   private final static String SQL_GET_USER_BY_NAME = "SELECT * FROM User WHERE UserName = ? ";
-  private final static String SQL_INSERT_USER = "INSERT INTO User (UserId, UserName, EmailAddress) VALUES (?, ?, ?)";
+  private final static String SQL_INSERT_USER = "INSERT INTO User (UserName, EmailAddress) VALUES (?, ?)";
   private final static String SQL_UPDATE_USER = "UPDATE User SET UserName = ?, EmailAddress = ? WHERE UserId = ? ";
   private final static String SQL_DELETE_USER_BY_ID = "DELETE FROM User WHERE UserId = ? ";
-  private final static String SQL_GET_MAX_USER_ID = "SELECT MAX(UserID) AS MaxUserId FROM User";
+  //private final static String SQL_GET_MAX_USER_ID = "SELECT MAX(UserID) AS MaxUserId FROM User";
   
   //private List<User> fetched = new ArrayList<>();
 
@@ -110,36 +110,29 @@ public class UserDAOImpl implements UserDAO {
   public long insertUser(User user) throws CustomException {
     Connection conn = null;
     PreparedStatement stmt = null;
-    PreparedStatement stmt_max_id = null;
-    ResultSet rs = null;
+    ResultSet generatedKeys = null;
     try {
       conn = H2DAOFactory.getConnection();
-      conn.setAutoCommit(false);
-      stmt_max_id = conn.prepareStatement(SQL_GET_MAX_USER_ID);
-      rs = stmt_max_id.executeQuery();
-      long id = 1;
-      if (rs.next()) {
-        id = rs.getLong("MaxUserId") + 1;
-        if (log.isDebugEnabled())
-          log.debug("insertUser(): Retrieve max user id: " + id);
-      }
       stmt = conn.prepareStatement(SQL_INSERT_USER, Statement.RETURN_GENERATED_KEYS);
-      stmt.setLong(1,  id);
-      stmt.setString(2, user.getUserName());
-      stmt.setString(3, user.getEmailAddress());
+      stmt.setString(1, user.getUserName());
+      stmt.setString(2, user.getEmailAddress());
       int affectedRows = stmt.executeUpdate();
-      conn.commit();
       if (affectedRows == 0) {
         log.error("insertUser(): Creating user failed, no rows affected." + user);
         throw new CustomException("Users Cannot be created");
       }
-      return id;
+      generatedKeys = stmt.getGeneratedKeys();
+      if (generatedKeys.next()) {
+        return generatedKeys.getLong(1);
+      } else {
+        log.error("Insert user failed, no ID obtained.");
+        throw new CustomException("User Cannot be created");
+      }
     } catch (SQLException e) {
       log.error("Error Inserting User :" + user);
       throw new CustomException("Error creating user data", e);
     } finally {
-      DbUtils.closeQuietly(stmt_max_id);
-      DbUtils.closeQuietly(conn, stmt, rs);
+      DbUtils.closeQuietly(conn, stmt, generatedKeys);
     }
 
   }
