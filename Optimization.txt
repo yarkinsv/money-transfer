@@ -1,0 +1,65 @@
+Параметры запуска:
+-XX:InitialHeapSize=129711744 -XX:MaxHeapSize=2075387904 -XX:+PrintCommandLineFlags -XX:+UseCompressedClassPointers
+-XX:+UseCompressedOops
+-XX:+UseParallelGC
+java version "1.8.0_191"
+Java(TM) SE Runtime Environment (build 1.8.0_191-b12)
+Java HotSpot(TM) 64-Bit Server VM (build 25.191-b12, mixed mode)
+
+
+1.  Запуск приложение без нагрузки:
+    CPU: ~ 0
+    GC: ~ 0
+    Heap:  максимум Used 38MB, размер увеличивался плавно, утечек не обнаружено.
+    Основные потребители памяти -  byte[], int[] , char[], java.lang.Object[]
+
+2. Вызываем функцию play_scenario_1 из run_tests.py в цикле:
+    CPU Max: 37.3
+    CPU avg: 20%
+    Основная нагрузка согласно Sampler - в методе com.moneytransfer.dao.impl.AccountDAOImpl.getAllAccounts()
+    вызов функции java.util.HashSet.add()- 40% всей нагрузки. Это, связано с некорректной реализацией
+    функции hashCode в классе com.moneytransfer.model.Account. Исправлено.
+    GC: ~ 0.2 %, раз в 30 секунд происходит всплеск до 20% - major garbage collection.
+    Heap: Объем потребляемой памяти постоянно растет, обнаружена утечка памяти - сильно растет количество объектов com.moneytransfer.model.User,
+    утечка устранена путем удаления List<User> fetched из com.moneytransfer.dao.impl.UserDAOImpl и
+    List<User> allUsers из com.moneytransfer.service.UserService.
+
+3. Вызываем функцию play_scenario_1 из run_tests.py в цикле :
+    CPU avg: 12%
+    Основная нагрузка согласно Sampler - системные функции и функции web-servera. Функции самого приложения составляют
+    не более 0.3% общей нагрузки.
+    GC: ~ 0.2 %
+    Heap: Used 20MB и постепенно растет в связи увеличением кол-ва созданных приложением объектов User и Account, данные для которых необходимо
+    выгружать из базы для обработки запросов, генерируемых тестовым приложением. Утечек памяти не обнаружены, после
+    отключения тестовой нагрузки и очистки памяти "Perform GC" в VisualVM объем потребляемой памяти стал равен
+    объему, который потреблялся на старте приложения, утечек памяти не обнаружено.
+
+4. Вызываем функцию get_user_image из run_tests.py в цикле :
+    CPU avg: 25%
+    Основная нагрузка из функций приложения согласно Sampler - com.moneytransfer.service.UserService.getUserImage() - 30%
+    Данная функция исправлена.
+    GC: ~ 0.2 %
+    Heap: ok, утечек не обнаружено.
+
+5. Вызываем функцию get_user_image из run_tests.py в цикле после исправления com.moneytransfer.service.UserService.getUserImage()  :
+    CPU avg: 6.2%
+    Основная нагрузка из функций приложения согласно Sampler - com.moneytransfer.service.UserService.getUserImage() - 0.3%
+    GC: ~ 0.2 %
+    Heap: ok, утечек не обнаружено.
+
+
+Пробуем разные GC.
+Приложение, запущенное с всеми нижеукзанными GC, показало примерно одинаковую производительность, активность GC и Used HEAP
+согласо VisualVB также во всех случаях были примерно одинаковы, различия были отмечены в размере выделенной HEAP, лучше
+всех себя показали G1GC и ShenandoahGC - их можно считать наилучшим выбором для данного приложения.
+
+ 1. -XX:+UseSerialGC - used HEAP 200 MB after 2000 runs of play_scenario_1 ,
+ 2.-XX:+UseConcMarkSweepGC -XX:ParallelCMSThreads=2  used HEAP 340MB after 2000 runs of play_scenario_1
+ 3. -XX:+UseG1GC - used HEAP 100 MB after 2000 runs of play_scenario_1
+ 4. -XX:+UseParallelGC - used HEAP 200 MB after 2000 runs of play_scenario_1
+ 5. -XX:+UseShenandoahGC used HEAP 110 MB after 2000 runs of play_scenario_1
+
+
+После изменения AccountDAOImpl и UserDAOImpl, избавившись от базы данных удалось увеличить производительность программы
+на 50%.
+
