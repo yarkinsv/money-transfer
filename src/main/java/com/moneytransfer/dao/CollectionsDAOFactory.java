@@ -33,6 +33,9 @@ public class CollectionsDAOFactory extends DAOFactory {
 	@Override
 	public void populateTestData() throws CustomException {
 		
+		userDAO.dropCollections();
+		accountDAO.dropCollections();
+		
 		log.info("Populating Test User collection and data ..... ");
 		
 		List<User> testUsers = new ArrayList<User>();

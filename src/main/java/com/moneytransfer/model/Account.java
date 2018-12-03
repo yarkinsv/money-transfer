@@ -44,6 +44,10 @@ public class Account {
   public BigDecimal getBalance() {
     return balance;
   }
+  
+  public void setBalance(BigDecimal newBalance) {
+    balance = newBalance;
+  }
 
   public String getCurrencyCode() {
     return currencyCode;

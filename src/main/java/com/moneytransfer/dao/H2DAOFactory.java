@@ -51,7 +51,7 @@ public class H2DAOFactory extends DAOFactory {
 
 	@Override
 	public void populateTestData() throws CustomException {
-		log.info("Populating Test User Table and data ..... ");
+		log.info("Populating Test User Table1 and data ..... ");
 		Connection conn = null;
 		try {
 			conn = H2DAOFactory.getConnection();

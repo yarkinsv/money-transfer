@@ -15,14 +15,14 @@ public abstract class DAOFactory {
 
 	public static DAOFactory getDAOFactory(int factoryCode) {
 
-		switch (factoryCode) {
-		case H2:
-			return new H2DAOFactory();
-		case Collections:
+		//switch (factoryCode) {
+		//case H2:
+		//	return new H2DAOFactory();
+		//case Collections:
 			return new CollectionsDAOFactory();
-		default:
+		//default:
 			// by default using H2 in memory database
-			return new H2DAOFactory();
-		}
+		//	return new H2DAOFactory();
+		//}
 	}
 }
