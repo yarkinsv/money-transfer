@@ -25,7 +25,6 @@ public class Application {
 	public static void main(String[] args) throws Exception {
 		log.info("Initialize demo .....");
 		DAOFactory hmDaoFactory = DAOFactory.getDAOFactory(DAOFactory.HM);
-
 		hmDaoFactory.populateTestData();
 		log.info("Initialisation Complete....");
 		// Host service on jetty

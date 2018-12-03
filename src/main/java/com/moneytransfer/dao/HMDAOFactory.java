@@ -12,8 +12,8 @@ import java.math.BigDecimal;
 public class HMDAOFactory extends DAOFactory {
     private static Logger log = Logger.getLogger(HMDAOFactory.class);
 
-    private static final UserDAO userDAO = new UserHMDAOImpl();
-    private static final AccountDAO accountDAO = new AccountHMDAOImpl();
+    private static final UserHMDAOImpl userDAO = new UserHMDAOImpl();
+    private static final AccountHMDAOImpl accountDAO = new AccountHMDAOImpl();
 
 
     @Override
@@ -28,13 +28,15 @@ public class HMDAOFactory extends DAOFactory {
 
     @Override
     public void populateTestData() throws CustomException {
+        userDAO.resetStorage();
+        accountDAO.resetStorage();
+
         log.info("Populating Test User Table and data ..... ");
         userDAO.insertUser(new User("test2", "test2@gmail.com"));
         userDAO.insertUser(new User("test1","test1@gmail.com"));
         userDAO.insertUser(new User("yangluo","yangluo@gmail.com"));
         userDAO.insertUser(new User("qinfran","qinfran@gmail.com"));
         userDAO.insertUser(new User("liusisi","liusisi@gmail.com"));
-
 
         accountDAO.createAccount(new Account("yangluo", new BigDecimal(100.0000),"USD"));
         accountDAO.createAccount (new Account("qinfran",new BigDecimal(200.0000),"USD"));

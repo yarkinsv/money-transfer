@@ -1,10 +1,8 @@
 package com.moneytransfer.dao.impl;
 
-import com.moneytransfer.dao.HMDAOFactory;
 import com.moneytransfer.dao.UserDAO;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.User;
-import org.apache.log4j.jmx.HierarchyDynamicMBean;
 
 import java.util.*;
 
@@ -64,5 +62,11 @@ public class UserHMDAOImpl implements UserDAO {
         users.remove(userId);
         namesToIds.remove(userName);
         return 1;
+    }
+
+    public void resetStorage() {
+        users = new HashMap<>();
+        namesToIds = new HashMap<>();
+        userId = 1;
     }
 }

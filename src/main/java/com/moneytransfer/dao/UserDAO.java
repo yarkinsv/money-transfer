@@ -18,4 +18,6 @@ public interface UserDAO {
 	int updateUser(Long userId, User user) throws CustomException;
 
 	int deleteUser(long userId) throws CustomException;
+
+
 }

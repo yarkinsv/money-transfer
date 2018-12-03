@@ -17,6 +17,7 @@ public class AccountHMDAOImpl implements AccountDAO {
     private HashMap<UserNameCurrency, Account> userToAccount = new HashMap<>();
     private long accountNum = 1;
 
+
     private class UserNameCurrency {
         private String userName;
         private String currency;
@@ -139,5 +140,10 @@ public class AccountHMDAOImpl implements AccountDAO {
         accounts.put(toAccountId, toAccount);
         userToAccount.put(new UserNameCurrency(toAccount.getUserName(), transactionCurrency), toAccount);
         return 2;
+    }
+    public void resetStorage() {
+        accounts = new HashMap<>();
+        userToAccount = new HashMap<>();
+        accountNum = 1;
     }
 }

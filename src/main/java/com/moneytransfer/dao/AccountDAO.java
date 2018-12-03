@@ -22,4 +22,5 @@ public interface AccountDAO {
   int updateAccountBalance(long accountId, BigDecimal deltaAmount) throws CustomException;
 
   int transferAccountBalance(UserTransaction userTransaction) throws CustomException;
+
 }
