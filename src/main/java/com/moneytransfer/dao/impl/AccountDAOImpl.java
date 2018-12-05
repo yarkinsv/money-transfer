@@ -102,12 +102,14 @@ public class AccountDAOImpl implements AccountDAO {
         if (log.isDebugEnabled()) {
           log.debug("Retrieve Account By userId: " + acc);
         }
+        return acc;
       }
-      return getAllAccounts()
+      else return null;
+      /*return getAllAccounts()
           .stream()
           .filter(account -> account.getUserName().equals(user) && account.getCurrencyCode().equals(currency))
           .findFirst()
-          .orElse(null);
+          .orElse(null);*/
     } catch (SQLException e) {
       throw new CustomException("getAccountById(): Error reading account data", e);
     } finally {
