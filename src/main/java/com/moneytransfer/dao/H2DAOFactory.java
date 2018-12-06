@@ -38,12 +38,12 @@ public class H2DAOFactory extends DAOFactory {
 	}
 
 	public UserDAO getUserDAO() {
-		DbUtils.loadDriver(h2_driver);
+		//DbUtils.loadDriver(h2_driver);
 		return new UserDAOImpl();
 	}
 
 	public AccountDAO getAccountDAO() {
-		DbUtils.loadDriver(h2_driver);
+		//DbUtils.loadDriver(h2_driver);
 		return new AccountDAOImpl();
 	}
 
