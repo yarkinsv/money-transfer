@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -120,7 +121,7 @@ public class AccountDAOImpl implements AccountDAO {
     ResultSet generatedKeys = null;
     try {
       conn = H2DAOFactory.getConnection();
-      stmt = conn.prepareStatement(SQL_CREATE_ACC);
+      stmt = conn.prepareStatement(SQL_CREATE_ACC, Statement.RETURN_GENERATED_KEYS);
       stmt.setString(1, account.getUserName());
       stmt.setBigDecimal(2, account.getBalance());
       stmt.setString(3, account.getCurrencyCode());
