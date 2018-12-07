@@ -77,11 +77,15 @@ public class UserService {
     if (!matcher.find()) {
       throw new WebApplicationException("User email is in wrong pattern", Response.Status.BAD_REQUEST);
     }
-    if (daoFactory.getUserDAO().getUserByName(user.getUserName()) != null) {
-      throw new WebApplicationException("User name already exist", Response.Status.BAD_REQUEST);
+    try {
+      final long uId = daoFactory.getUserDAO().insertUser(user);
+      return daoFactory.getUserDAO().getUserById(uId);
+    } catch (CustomException e) {
+      // Somewhat clumsy, but I don't know better way.
+      if (e.getCause().toString().contains("Unique index or primary key violation"))
+        throw new WebApplicationException("User name already exist", Response.Status.BAD_REQUEST);
+      else throw e;
     }
-    final long uId = daoFactory.getUserDAO().insertUser(user);
-    return daoFactory.getUserDAO().getUserById(uId);
   }
 
   /**
