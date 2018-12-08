@@ -37,8 +37,8 @@ public class AccountService {
   @GET
   @Path("/all")
   public Response getAllAccounts() throws CustomException {
-    List<Account> account = daoFactory.getAccountDAO().getAllAccounts();
-    return Response.ok("[" + account.stream().map(Account::toString).collect(Collectors.joining(",")) + "]").build();
+    List<Account> accounts = daoFactory.getAccountDAO().getAllAccounts();
+    return Response.ok(accounts).build();
   }
 
   /**
@@ -51,13 +51,13 @@ public class AccountService {
   @GET
   @Path("/{accountId}")
   public Response getAccount(@PathParam("accountId") long accountId) throws CustomException {
-    return Response.ok(daoFactory.getAccountDAO().getAccountById(accountId).toString()).build();
+    return Response.ok(daoFactory.getAccountDAO().getAccountById(accountId)).build();
   }
 
   @GET
   @Path("/by_user/{user}/{code}")
   public Response getAccount(@PathParam("user") String user, @PathParam("code") String code) throws CustomException {
-    return Response.ok(daoFactory.getAccountDAO().getAccountByUser(user, code).toString()).build();
+    return Response.ok(daoFactory.getAccountDAO().getAccountByUser(user, code)).build();
   }
 
   /**
@@ -89,7 +89,7 @@ public class AccountService {
   @Path("/create")
   public Response createAccount(Account account) throws CustomException {
     final long accountId = daoFactory.getAccountDAO().createAccount(account);
-    return Response.ok(daoFactory.getAccountDAO().getAccountById(accountId).toString()).build();
+    return Response.ok(daoFactory.getAccountDAO().getAccountById(accountId)).build();
   }
 
   /**
@@ -109,7 +109,7 @@ public class AccountService {
     }
 
     daoFactory.getAccountDAO().updateAccountBalance(accountId, amount.setScale(4, RoundingMode.HALF_EVEN));
-    return Response.ok(daoFactory.getAccountDAO().getAccountById(accountId).toString()).build();
+    return Response.ok(daoFactory.getAccountDAO().getAccountById(accountId)).build();
   }
 
   /**
@@ -131,7 +131,7 @@ public class AccountService {
       log.debug("Withdraw service: delta change to account  " + delta + " Account ID = " + accountId);
     }
     daoFactory.getAccountDAO().updateAccountBalance(accountId, delta.setScale(4, RoundingMode.HALF_EVEN));
-    return Response.ok(daoFactory.getAccountDAO().getAccountById(accountId).toString()).build();
+    return Response.ok(daoFactory.getAccountDAO().getAccountById(accountId)).build();
   }
 
   /**
