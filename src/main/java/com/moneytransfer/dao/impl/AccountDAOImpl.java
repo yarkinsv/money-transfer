@@ -24,9 +24,9 @@ public class AccountDAOImpl implements AccountDAO {
   private static Logger log = Logger.getLogger(AccountDAOImpl.class);
   private final static String SQL_GET_ACC_BY_ID = "SELECT * FROM Account WHERE AccountId = ? ";
   private final static String SQL_GET_ACC_BY_USER_ID = "SELECT * FROM Account WHERE UserName = ? AND CurrencyCode = ?";
-  private final static String SQL_LOCK_ACC_BY_ID = "SELECT * FROM Account WHERE AccountId = ? FOR UPDATE";
   private final static String SQL_CREATE_ACC = "INSERT INTO Account (UserName, Balance, CurrencyCode) VALUES (?, ?, ?)";
-  private final static String SQL_UPDATE_ACC_BALANCE = "UPDATE Account SET Balance = ? WHERE AccountId = ? ";
+  private final static String SQL_UPDATE_ACC_BALANCE = "UPDATE Account SET Balance = Balance + ? WHERE AccountId = ?";
+  private final static String SQL_UPDATE_ACC_BALANCE_WITH_CUR = "UPDATE Account SET Balance = Balance + ? WHERE AccountId = ? AND CurrencyCode = ?";
   private final static String SQL_GET_ALL_ACC = "SELECT * FROM Account";
   private final static String SQL_DELETE_ACC_BY_ID = "DELETE FROM Account WHERE AccountId = ?";
 
@@ -169,45 +169,23 @@ public class AccountDAOImpl implements AccountDAO {
    */
   public int updateAccountBalance(long accountId, BigDecimal deltaAmount) throws CustomException {
     Connection conn = null;
-    PreparedStatement lockStmt = null;
-    PreparedStatement updateStmt = null;
-    ResultSet rs = null;
-    Account targetAccount = null;
+    PreparedStatement stmt = null;
     int updateCount = -1;
     try {
       conn = H2DAOFactory.getConnection();
       conn.setAutoCommit(false);
-      // lock account for writing:
-      lockStmt = conn.prepareStatement(SQL_LOCK_ACC_BY_ID);
-      lockStmt.setLong(1, accountId);
-      rs = lockStmt.executeQuery();
-      if (rs.next()) {
-        targetAccount = new Account(rs.getLong("AccountId"), rs.getString("UserName"),
-            rs.getBigDecimal("Balance"), rs.getString("CurrencyCode"));
-        if (log.isDebugEnabled()) {
-          log.debug("updateAccountBalance from Account: " + targetAccount);
-        }
-      }
-
-      if (targetAccount == null) {
-        throw new CustomException("updateAccountBalance(): fail to lock account : " + accountId);
-      }
-      // update account upon success locking
-      BigDecimal balance = targetAccount.getBalance().add(deltaAmount);
-      if (balance.compareTo(MoneyUtil.zeroAmount) < 0) {
-        throw new CustomException("Not sufficient Fund for account: " + accountId);
-      }
-
-      updateStmt = conn.prepareStatement(SQL_UPDATE_ACC_BALANCE);
-      updateStmt.setBigDecimal(1, balance);
-      updateStmt.setLong(2, accountId);
-      updateCount = updateStmt.executeUpdate();
+      stmt = conn.prepareStatement(SQL_UPDATE_ACC_BALANCE);
+      stmt.setBigDecimal(1, deltaAmount);
+      stmt.setLong(2, accountId);
+      updateCount = stmt.executeUpdate();
       conn.commit();
       if (log.isDebugEnabled()) {
-        log.debug("New Balance after Update: " + targetAccount);
+        log.debug("New Balance after Update: " + accountId);
       }
       return updateCount;
     } catch (SQLException se) {
+      if (se.toString().contains("Check constraint violation"))
+        throw new CustomException("Not sufficient Fund for account: " + accountId);
       // rollback transaction if exception occurs
       log.error("updateAccountBalance(): User Transaction Failed, rollback initiated for: " + accountId, se);
       try {
@@ -218,9 +196,7 @@ public class AccountDAOImpl implements AccountDAO {
       }
     } finally {
       DbUtils.closeQuietly(conn);
-      DbUtils.closeQuietly(rs);
-      DbUtils.closeQuietly(lockStmt);
-      DbUtils.closeQuietly(updateStmt);
+      DbUtils.closeQuietly(stmt);
     }
     return updateCount;
   }
@@ -231,75 +207,41 @@ public class AccountDAOImpl implements AccountDAO {
   public int transferAccountBalance(UserTransaction userTransaction) throws CustomException {
     int result = -1;
     Connection conn = null;
-    PreparedStatement lockStmt = null;
-    PreparedStatement updateStmt = null;
-    ResultSet rs = null;
-    Account fromAccount = null;
-    Account toAccount = null;
+    PreparedStatement stmt = null;
 
     try {
       conn = H2DAOFactory.getConnection();
       conn.setAutoCommit(false);
-      // lock the credit and debit account for writing:
-      lockStmt = conn.prepareStatement(SQL_LOCK_ACC_BY_ID);
-      lockStmt.setLong(1, userTransaction.getFromAccountId());
-      rs = lockStmt.executeQuery();
-      if (rs.next()) {
-        fromAccount = new Account(rs.getLong("AccountId"), rs.getString("UserName"),
-            rs.getBigDecimal("Balance"), rs.getString("CurrencyCode"));
-        if (log.isDebugEnabled()) {
-          log.debug("transferAccountBalance from Account: " + fromAccount);
-        }
+      stmt = conn.prepareStatement(SQL_UPDATE_ACC_BALANCE_WITH_CUR);
+      stmt.setBigDecimal(1, MoneyUtil.zeroAmount.subtract(userTransaction.getAmount()));
+      stmt.setLong(2, userTransaction.getFromAccountId());
+      stmt.setString(3, userTransaction.getCurrencyCode());
+      if (log.isDebugEnabled()) {
+        log.debug("transferAccountBalance from Account: " + userTransaction.getFromAccountId());
       }
-      lockStmt = conn.prepareStatement(SQL_LOCK_ACC_BY_ID);
-      lockStmt.setLong(1, userTransaction.getToAccountId());
-      rs = lockStmt.executeQuery();
-      if (rs.next()) {
-        toAccount = new Account(rs.getLong("AccountId"), rs.getString("UserName"), rs.getBigDecimal("Balance"),
-            rs.getString("CurrencyCode"));
-        if (log.isDebugEnabled()) {
-          log.debug("transferAccountBalance to Account: " + toAccount);
-        }
+      stmt.addBatch();
+      stmt.setBigDecimal(1, userTransaction.getAmount());
+      stmt.setLong(2, userTransaction.getToAccountId());
+      stmt.setString(3, userTransaction.getCurrencyCode());
+      if (log.isDebugEnabled()) {
+        log.debug("transferAccountBalance to Account: " + userTransaction.getToAccountId());
       }
-
-      // check locking status
-      if (fromAccount == null || toAccount == null) {
-        throw new CustomException("Fail to lock both accounts for write");
-      }
-
-      // check transaction currency
-      if (!fromAccount.getCurrencyCode().equals(userTransaction.getCurrencyCode())) {
-        throw new CustomException(
-            "Fail to transfer Fund, transaction ccy are different from source/destination");
-      }
-
-      // check ccy is the same for both accounts
-      if (!fromAccount.getCurrencyCode().equals(toAccount.getCurrencyCode())) {
-        throw new CustomException(
-            "Fail to transfer Fund, the source and destination account are in different currency");
-      }
-
-      // check enough fund in source account
-      BigDecimal fromAccountLeftOver = fromAccount.getBalance().subtract(userTransaction.getAmount());
-      if (fromAccountLeftOver.compareTo(MoneyUtil.zeroAmount) < 0) {
-        throw new CustomException("Not enough Fund from source Account ");
-      }
-      // proceed with update
-      updateStmt = conn.prepareStatement(SQL_UPDATE_ACC_BALANCE);
-      updateStmt.setBigDecimal(1, fromAccountLeftOver);
-      updateStmt.setLong(2, userTransaction.getFromAccountId());
-      updateStmt.addBatch();
-      updateStmt.setBigDecimal(1, toAccount.getBalance().add(userTransaction.getAmount()));
-      updateStmt.setLong(2, userTransaction.getToAccountId());
-      updateStmt.addBatch();
-      int[] rowsUpdated = updateStmt.executeBatch();
+      stmt.addBatch();
+      int[] rowsUpdated = stmt.executeBatch();
       result = rowsUpdated[0] + rowsUpdated[1];
+      if (result != 2) {
+        throw new CustomException("Fail to transfer Fund");
+      }
       if (log.isDebugEnabled()) {
         log.debug("Number of rows updated for the transfer : " + result);
       }
       // If there is no error, commit the transaction
       conn.commit();
     } catch (SQLException se) {
+      // check enough fund in source account
+      if (se.toString().contains("Check constraint violation"))
+        throw new CustomException("Not enough Fund from source Account " +
+                                  userTransaction.getToAccountId());
       // rollback transaction if exception occurs
       log.error("transferAccountBalance(): User Transaction Failed, rollback initiated for: " + userTransaction,
           se);
@@ -311,9 +253,7 @@ public class AccountDAOImpl implements AccountDAO {
       }
     } finally {
       DbUtils.closeQuietly(conn);
-      DbUtils.closeQuietly(rs);
-      DbUtils.closeQuietly(lockStmt);
-      DbUtils.closeQuietly(updateStmt);
+      DbUtils.closeQuietly(stmt);
     }
     return result;
   }
