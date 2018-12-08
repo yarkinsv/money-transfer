@@ -5,6 +5,7 @@ import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.Account;
 import com.moneytransfer.model.MoneyUtil;
 
+import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 
@@ -36,7 +37,7 @@ public class AccountService {
   @GET
   @Path("/all")
   public Response getAllAccounts() throws CustomException {
-    Set<Account> account = daoFactory.getAccountDAO().getAllAccounts();
+    List<Account> account = daoFactory.getAccountDAO().getAllAccounts();
     return Response.ok("[" + account.stream().map(Account::toString).collect(Collectors.joining(",")) + "]").build();
   }
 
