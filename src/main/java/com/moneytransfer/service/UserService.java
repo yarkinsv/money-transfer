@@ -1,16 +1,15 @@
 package com.moneytransfer.service;
 
 import com.moneytransfer.dao.DAOFactory;
+import com.moneytransfer.dao.UserDAO;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.User;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -27,7 +26,7 @@ import org.apache.log4j.Logger;
 @Produces(MediaType.APPLICATION_JSON)
 public class UserService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final UserDAO userDAO = DAOFactory.getDAOFactory(DAOFactory.H2).getUserDAO();
 
   private static Logger log = Logger.getLogger(UserService.class);
 
@@ -43,7 +42,7 @@ public class UserService {
   public User getUserByName(@PathParam("userName") String userName) throws CustomException {
     if (log.isDebugEnabled())
       log.debug("Request Received for get User by Name " + userName);
-    final User user = daoFactory.getUserDAO().getUserByName(userName);
+    final User user = userDAO.getUserByName(userName);
     if (user == null) {
       throw new WebApplicationException("User Not Found", Response.Status.NOT_FOUND);
     }
@@ -59,7 +58,7 @@ public class UserService {
   @GET
   @Path("/all")
   public Response getAllUsers() throws CustomException {
-    List<User> users = daoFactory.getUserDAO().getAllUsers();
+    List<User> users = userDAO.getAllUsers();
     return Response.ok(users).build();
   }
 
@@ -77,11 +76,11 @@ public class UserService {
     if (!matcher.find()) {
       throw new WebApplicationException("User email is in wrong pattern", Response.Status.BAD_REQUEST);
     }
-    if (daoFactory.getUserDAO().getUserByName(user.getUserName()) != null) {
+    if (userDAO.getUserByName(user.getUserName()) != null) {
       throw new WebApplicationException("User name already exist", Response.Status.BAD_REQUEST);
     }
-    final long uId = daoFactory.getUserDAO().insertUser(user);
-    return daoFactory.getUserDAO().getUserById(uId);
+    final long uId = userDAO.insertUser(user);
+    return userDAO.getUserById(uId);
   }
 
   /**
@@ -95,7 +94,7 @@ public class UserService {
   @PUT
   @Path("/{userId}")
   public Response updateUser(@PathParam("userId") long userId, User user) throws CustomException {
-    final int updateCount = daoFactory.getUserDAO().updateUser(userId, user);
+    final int updateCount = userDAO.updateUser(userId, user);
     if (updateCount == 1) {
       return Response.status(Response.Status.OK).build();
     } else {
@@ -113,7 +112,7 @@ public class UserService {
   @DELETE
   @Path("/{userId}")
   public Response deleteUser(@PathParam("userId") long userId) throws CustomException {
-    int deleteCount = daoFactory.getUserDAO().deleteUser(userId);
+    int deleteCount = userDAO.deleteUser(userId);
     if (deleteCount == 1) {
       return Response.status(Response.Status.OK).build();
     } else {
