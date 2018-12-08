@@ -62,18 +62,5 @@ public class Account {
     return currencyCode.equals(account.currencyCode);
   }
 
-  @Override
-  public int hashCode() {
-    return 1;
-  }
 
-  @Override
-  public String toString() {
-    return "{" +
-        "\"accountId\":" + accountId +
-        ", \"userName\":\"" + userName + '\"' +
-        ", \"balance\":" + balance +
-        ", \"currencyCode\":\"" + currencyCode + '\"' +
-        '}';
-  }
 }

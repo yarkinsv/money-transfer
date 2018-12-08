@@ -7,6 +7,8 @@ import com.moneytransfer.model.Account;
 import com.moneytransfer.model.MoneyUtil;
 import com.moneytransfer.model.UserTransaction;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.log4j.Logger;
 
@@ -32,11 +34,11 @@ public class AccountDAOImpl implements AccountDAO {
   /**
    * Get all accounts.
    */
-  public Set<Account> getAllAccounts() throws CustomException {
+  public List<Account> getAllAccounts() throws CustomException {
     Connection conn = null;
     PreparedStatement stmt = null;
     ResultSet rs = null;
-    Set<Account> allAccounts = new HashSet<>();
+    List<Account> allAccounts = new ArrayList<Account>();
     try {
       conn = H2DAOFactory.getConnection();
       stmt = conn.prepareStatement(SQL_GET_ALL_ACC);
@@ -103,11 +105,7 @@ public class AccountDAOImpl implements AccountDAO {
           log.debug("Retrieve Account By userId: " + acc);
         }
       }
-      return getAllAccounts()
-          .stream()
-          .filter(account -> account.getUserName().equals(user) && account.getCurrencyCode().equals(currency))
-          .findFirst()
-          .orElse(null);
+      return acc;
     } catch (SQLException e) {
       throw new CustomException("getAccountById(): Error reading account data", e);
     } finally {

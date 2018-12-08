@@ -1,11 +1,12 @@
 package com.moneytransfer.service;
 
+import com.moneytransfer.dao.AccountDAO;
 import com.moneytransfer.dao.DAOFactory;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.Account;
 import com.moneytransfer.model.MoneyUtil;
 
-import java.util.stream.Collectors;
+import java.util.List;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
@@ -13,7 +14,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Set;
 
 /**
  * Account Service
@@ -23,7 +23,7 @@ import java.util.Set;
 @Consumes(MediaType.APPLICATION_JSON)
 public class AccountService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final AccountDAO accountDAO = DAOFactory.getDAOFactory(DAOFactory.H2).getAccountDAO();
 
   private static Logger log = Logger.getLogger(AccountService.class);
 
@@ -36,8 +36,8 @@ public class AccountService {
   @GET
   @Path("/all")
   public Response getAllAccounts() throws CustomException {
-    Set<Account> account = daoFactory.getAccountDAO().getAllAccounts();
-    return Response.ok("[" + account.stream().map(Account::toString).collect(Collectors.joining(",")) + "]").build();
+    List<Account> accounts = accountDAO.getAllAccounts();
+    return Response.ok(accounts).build();
   }
 
   /**
@@ -50,13 +50,13 @@ public class AccountService {
   @GET
   @Path("/{accountId}")
   public Response getAccount(@PathParam("accountId") long accountId) throws CustomException {
-    return Response.ok(daoFactory.getAccountDAO().getAccountById(accountId).toString()).build();
+    return Response.ok(accountDAO.getAccountById(accountId)).build();
   }
 
   @GET
   @Path("/by_user/{user}/{code}")
   public Response getAccount(@PathParam("user") String user, @PathParam("code") String code) throws CustomException {
-    return Response.ok(daoFactory.getAccountDAO().getAccountByUser(user, code).toString()).build();
+    return Response.ok(accountDAO.getAccountByUser(user, code)).build();
   }
 
   /**
@@ -69,7 +69,7 @@ public class AccountService {
   @GET
   @Path("/{accountId}/balance")
   public BigDecimal getBalance(@PathParam("accountId") long accountId) throws CustomException {
-    final Account account = daoFactory.getAccountDAO().getAccountById(accountId);
+    final Account account = accountDAO.getAccountById(accountId);
 
     if (account == null) {
       throw new WebApplicationException("Account not found", Response.Status.NOT_FOUND);
@@ -87,8 +87,8 @@ public class AccountService {
   @POST
   @Path("/create")
   public Response createAccount(Account account) throws CustomException {
-    final long accountId = daoFactory.getAccountDAO().createAccount(account);
-    return Response.ok(daoFactory.getAccountDAO().getAccountById(accountId).toString()).build();
+    final long accountId = accountDAO.createAccount(account);
+    return Response.ok(accountDAO.getAccountById(accountId)).build();
   }
 
   /**
@@ -107,8 +107,8 @@ public class AccountService {
       throw new WebApplicationException("Invalid Deposit amount", Response.Status.BAD_REQUEST);
     }
 
-    daoFactory.getAccountDAO().updateAccountBalance(accountId, amount.setScale(4, RoundingMode.HALF_EVEN));
-    return Response.ok(daoFactory.getAccountDAO().getAccountById(accountId).toString()).build();
+    accountDAO.updateAccountBalance(accountId, amount.setScale(4, RoundingMode.HALF_EVEN));
+    return Response.ok(accountDAO.getAccountById(accountId)).build();
   }
 
   /**
@@ -129,8 +129,8 @@ public class AccountService {
     if (log.isDebugEnabled()) {
       log.debug("Withdraw service: delta change to account  " + delta + " Account ID = " + accountId);
     }
-    daoFactory.getAccountDAO().updateAccountBalance(accountId, delta.setScale(4, RoundingMode.HALF_EVEN));
-    return Response.ok(daoFactory.getAccountDAO().getAccountById(accountId).toString()).build();
+    accountDAO.updateAccountBalance(accountId, delta.setScale(4, RoundingMode.HALF_EVEN));
+    return Response.ok(accountDAO.getAccountById(accountId)).build();
   }
 
   /**
@@ -143,7 +143,7 @@ public class AccountService {
   @DELETE
   @Path("/{accountId}")
   public Response deleteAccount(@PathParam("accountId") long accountId) throws CustomException {
-    int deleteCount = daoFactory.getAccountDAO().deleteAccountById(accountId);
+    int deleteCount = accountDAO.deleteAccountById(accountId);
     if (deleteCount == 1) {
       return Response.status(Response.Status.OK).build();
     } else {

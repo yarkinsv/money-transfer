@@ -50,21 +50,4 @@ public class User {
     return emailAddress.equals(user.emailAddress);
 
   }
-
-  @Override
-  public int hashCode() {
-    int result = (int) (userId ^ (userId >>> 32));
-    result = 31 * result + userName.hashCode();
-    result = 31 * result + emailAddress.hashCode();
-    return result;
-  }
-
-  @Override
-  public String toString() {
-    return "{" +
-        "\"userId\":" + userId +
-        ", \"userName\":\"" + userName + '\"' +
-        ", \"emailAddress\":\"" + emailAddress + '\"' +
-        '}';
-  }
 }
