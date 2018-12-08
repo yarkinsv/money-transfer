@@ -13,7 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Account Service
@@ -23,7 +23,7 @@ import java.util.Set;
 @Consumes(MediaType.APPLICATION_JSON)
 public class AccountService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.Collections);
 
   private static Logger log = Logger.getLogger(AccountService.class);
 
@@ -36,7 +36,7 @@ public class AccountService {
   @GET
   @Path("/all")
   public Response getAllAccounts() throws CustomException {
-    Set<Account> account = daoFactory.getAccountDAO().getAllAccounts();
+    List<Account> account = daoFactory.getAccountDAO().getAllAccounts();
     return Response.ok("[" + account.stream().map(Account::toString).collect(Collectors.joining(",")) + "]").build();
   }
 

@@ -38,18 +38,20 @@ public class H2DAOFactory extends DAOFactory {
 	}
 
 	public UserDAO getUserDAO() {
-		DbUtils.loadDriver(h2_driver);
-		return new UserDAOImpl();
+		//DbUtils.loadDriver(h2_driver);
+		//return new UserDAOImpl();
+		return userDAO;
 	}
 
 	public AccountDAO getAccountDAO() {
-		DbUtils.loadDriver(h2_driver);
-		return new AccountDAOImpl();
+		//DbUtils.loadDriver(h2_driver);
+		//return new AccountDAOImpl();
+		return accountDAO;
 	}
 
 	@Override
 	public void populateTestData() throws CustomException {
-		log.info("Populating Test User Table and data ..... ");
+		log.info("Populating Test User Table1 and data ..... ");
 		Connection conn = null;
 		try {
 			conn = H2DAOFactory.getConnection();

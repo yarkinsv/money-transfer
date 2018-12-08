@@ -44,6 +44,10 @@ public class Account {
   public BigDecimal getBalance() {
     return balance;
   }
+  
+  public void setBalance(BigDecimal newBalance) {
+    balance = newBalance;
+  }
 
   public String getCurrencyCode() {
     return currencyCode;
@@ -64,7 +68,12 @@ public class Account {
 
   @Override
   public int hashCode() {
-    return 1;
+    //return Objects.hash(accountId, userName, balance, currencyCode);
+		int result = Long.hashCode(accountId);
+		result = 31 * result + userName.hashCode();
+		result = 31 * result + balance.hashCode();
+		result = 31 * result + currencyCode.hashCode();
+		return result;
   }
 
   @Override

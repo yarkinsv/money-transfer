@@ -15,8 +15,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AccountDAOImpl implements AccountDAO {
 
@@ -32,11 +32,11 @@ public class AccountDAOImpl implements AccountDAO {
   /**
    * Get all accounts.
    */
-  public Set<Account> getAllAccounts() throws CustomException {
+  public List<Account> getAllAccounts() throws CustomException {
     Connection conn = null;
     PreparedStatement stmt = null;
     ResultSet rs = null;
-    Set<Account> allAccounts = new HashSet<>();
+    List<Account> allAccounts = new ArrayList<>();
     try {
       conn = H2DAOFactory.getConnection();
       stmt = conn.prepareStatement(SQL_GET_ALL_ACC);
@@ -103,11 +103,7 @@ public class AccountDAOImpl implements AccountDAO {
           log.debug("Retrieve Account By userId: " + acc);
         }
       }
-      return getAllAccounts()
-          .stream()
-          .filter(account -> account.getUserName().equals(user) && account.getCurrencyCode().equals(currency))
-          .findFirst()
-          .orElse(null);
+      return acc;
     } catch (SQLException e) {
       throw new CustomException("getAccountById(): Error reading account data", e);
     } finally {
@@ -162,8 +158,8 @@ public class AccountDAOImpl implements AccountDAO {
     } catch (SQLException e) {
       throw new CustomException("deleteAccountById(): Error deleting user account Id " + accountId, e);
     } finally {
+      DbUtils.closeQuietly(stmt);      
       DbUtils.closeQuietly(conn);
-      DbUtils.closeQuietly(stmt);
     }
   }
 
@@ -220,10 +216,10 @@ public class AccountDAOImpl implements AccountDAO {
         throw new CustomException("Fail to rollback transaction", re);
       }
     } finally {
-      DbUtils.closeQuietly(conn);
       DbUtils.closeQuietly(rs);
       DbUtils.closeQuietly(lockStmt);
       DbUtils.closeQuietly(updateStmt);
+      DbUtils.closeQuietly(conn);
     }
     return updateCount;
   }
@@ -254,6 +250,10 @@ public class AccountDAOImpl implements AccountDAO {
           log.debug("transferAccountBalance from Account: " + fromAccount);
         }
       }
+      
+      DbUtils.closeQuietly(rs);
+      DbUtils.closeQuietly(lockStmt);
+      
       lockStmt = conn.prepareStatement(SQL_LOCK_ACC_BY_ID);
       lockStmt.setLong(1, userTransaction.getToAccountId());
       rs = lockStmt.executeQuery();
@@ -313,10 +313,10 @@ public class AccountDAOImpl implements AccountDAO {
         throw new CustomException("Fail to rollback transaction", re);
       }
     } finally {
-      DbUtils.closeQuietly(conn);
       DbUtils.closeQuietly(rs);
       DbUtils.closeQuietly(lockStmt);
       DbUtils.closeQuietly(updateStmt);
+      DbUtils.closeQuietly(conn);
     }
     return result;
   }
