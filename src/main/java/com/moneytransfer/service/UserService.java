@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 @Produces(MediaType.APPLICATION_JSON)
 public class UserService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final DAOFactory daoFactory = DAOFactory.getDAOFactory();
 
   private static Logger log = Logger.getLogger(UserService.class);
 

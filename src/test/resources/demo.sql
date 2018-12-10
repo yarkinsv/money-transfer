@@ -2,17 +2,17 @@
 
 DROP TABLE IF EXISTS User;
 
-CREATE TABLE User (UserId LONG PRIMARY KEY NOT NULL,
+CREATE TABLE User (UserId LONG PRIMARY KEY AUTO_INCREMENT NOT NULL,
  UserName VARCHAR(30) NOT NULL,
  EmailAddress VARCHAR(30) NOT NULL);
 
 CREATE UNIQUE INDEX idx_ue on User(UserName,EmailAddress);
 
-INSERT INTO User (UserId, UserName, EmailAddress) VALUES (1, 'test2','test2@gmail.com');
-INSERT INTO User (UserId, UserName, EmailAddress) VALUES (2, 'test1','test1@gmail.com');
-INSERT INTO User (UserId, UserName, EmailAddress) VALUES (3, 'yangluo','yangluo@gmail.com');
-INSERT INTO User (UserId, UserName, EmailAddress) VALUES (4, 'qinfran','qinfran@gmail.com');
-INSERT INTO User (UserId, UserName, EmailAddress) VALUES (5, 'liusisi','liusisi@gmail.com');
+INSERT INTO User (UserName, EmailAddress) VALUES ('test2','test2@gmail.com');
+INSERT INTO User (UserName, EmailAddress) VALUES ('test1','test1@gmail.com');
+INSERT INTO User (UserName, EmailAddress) VALUES ('yangluo','yangluo@gmail.com');
+INSERT INTO User (UserName, EmailAddress) VALUES ('qinfran','qinfran@gmail.com');
+INSERT INTO User (UserName, EmailAddress) VALUES ('liusisi','liusisi@gmail.com');
 
 DROP TABLE IF EXISTS Account;
 
