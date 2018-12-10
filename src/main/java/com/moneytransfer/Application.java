@@ -6,6 +6,7 @@ import com.moneytransfer.service.ServiceExceptionMapper;
 import com.moneytransfer.service.TransactionService;
 import com.moneytransfer.service.UserService;
 
+import com.moneytransfer.utils.Utils;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
@@ -25,8 +26,14 @@ public class Application {
 	public static void main(String[] args) throws Exception {
 		// Initialize H2 database with demo data
 		log.info("Initialize demo .....");
-		DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
-		h2DaoFactory.populateTestData();
+		String param="";
+		for (String arg:args) {
+			if ("-dao=".equals(arg.substring(0,5)))
+				param=arg.substring(5);
+		}
+		DAOFactory.setDAOFactory(param);
+		DAOFactory DaoFactory = DAOFactory.getDAOFactory();
+		DaoFactory.populateTestData();
 		log.info("Initialisation Complete....");
 		// Host service on jetty
 		startService();
