@@ -38,12 +38,10 @@ public class H2DAOFactory extends DAOFactory {
 	}
 
 	public UserDAO getUserDAO() {
-		DbUtils.loadDriver(h2_driver);
 		return userDAO; // UserDAOImpl is stateless
 	}
 
 	public AccountDAO getAccountDAO() {
-		DbUtils.loadDriver(h2_driver);
 		return accountDAO; // AccountDAOImpl is stateless
 	}
 
