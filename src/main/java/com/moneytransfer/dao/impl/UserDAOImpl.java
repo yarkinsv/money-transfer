@@ -22,8 +22,6 @@ public class UserDAOImpl implements UserDAO {
   private final static String SQL_UPDATE_USER = "UPDATE User SET UserName = ?, EmailAddress = ? WHERE UserId = ? ";
   private final static String SQL_DELETE_USER_BY_ID = "DELETE FROM User WHERE UserId = ? ";
 
-  private List<User> fetched = new ArrayList<>();
-
   /**
    * Find all users
    */
@@ -42,7 +40,6 @@ public class UserDAOImpl implements UserDAO {
         if (log.isDebugEnabled())
           log.debug("getAllUsers() Retrieve User: " + u);
       }
-      fetched.addAll(users);
       return users;
     } catch (SQLException e) {
       throw new CustomException("Error reading user data", e);
@@ -113,7 +110,7 @@ public class UserDAOImpl implements UserDAO {
       conn = H2DAOFactory.getConnection();
       stmt = conn.prepareStatement(SQL_INSERT_USER, Statement.RETURN_GENERATED_KEYS);
       long id = getAllUsers().stream().mapToLong(User::getUserId).max().orElse(0) + 1;
-      stmt.setLong(1,  id);
+      stmt.setLong(1, id);
       stmt.setString(2, user.getUserName());
       stmt.setString(3, user.getEmailAddress());
       int affectedRows = stmt.executeUpdate();
