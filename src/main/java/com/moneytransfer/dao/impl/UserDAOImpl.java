@@ -18,11 +18,10 @@ public class UserDAOImpl implements UserDAO {
   private final static String SQL_GET_USER_BY_ID = "SELECT * FROM User WHERE UserId = ? ";
   private final static String SQL_GET_ALL_USERS = "SELECT * FROM User";
   private final static String SQL_GET_USER_BY_NAME = "SELECT * FROM User WHERE UserName = ? ";
-  private final static String SQL_INSERT_USER = "INSERT INTO User (UserId, UserName, EmailAddress) VALUES (?, ?, ?)";
+  private final static String SQL_INSERT_USER = "INSERT INTO User (UserName, EmailAddress) VALUES (?, ?)";
   private final static String SQL_UPDATE_USER = "UPDATE User SET UserName = ?, EmailAddress = ? WHERE UserId = ? ";
   private final static String SQL_DELETE_USER_BY_ID = "DELETE FROM User WHERE UserId = ? ";
 
-  private List<User> fetched = new ArrayList<>();
 
   /**
    * Find all users
@@ -42,7 +41,7 @@ public class UserDAOImpl implements UserDAO {
         if (log.isDebugEnabled())
           log.debug("getAllUsers() Retrieve User: " + u);
       }
-      fetched.addAll(users);
+
       return users;
     } catch (SQLException e) {
       throw new CustomException("Error reading user data", e);
@@ -112,16 +111,23 @@ public class UserDAOImpl implements UserDAO {
     try {
       conn = H2DAOFactory.getConnection();
       stmt = conn.prepareStatement(SQL_INSERT_USER, Statement.RETURN_GENERATED_KEYS);
-      long id = getAllUsers().stream().mapToLong(User::getUserId).max().orElse(0) + 1;
-      stmt.setLong(1,  id);
-      stmt.setString(2, user.getUserName());
-      stmt.setString(3, user.getEmailAddress());
+      stmt.setString(1, user.getUserName());
+      stmt.setString(2, user.getEmailAddress());
       int affectedRows = stmt.executeUpdate();
+
+      try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+        if (generatedKeys.next()) {
+          user.setUserId(generatedKeys.getLong(1));
+        } else {
+          throw new SQLException("Creating user failed, no ID obtained.");
+        }
+      }
+
       if (affectedRows == 0) {
         log.error("insertUser(): Creating user failed, no rows affected." + user);
         throw new CustomException("Users Cannot be created");
       }
-      return id;
+      return user.getUserId();
     } catch (SQLException e) {
       log.error("Error Inserting User :" + user);
       throw new CustomException("Error creating user data", e);

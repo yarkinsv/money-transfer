@@ -7,6 +7,7 @@ import com.moneytransfer.utils.Utils;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.log4j.Logger;
+import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.tools.RunScript;
 
 import java.io.FileNotFoundException;
@@ -34,17 +35,22 @@ public class H2DAOFactory extends DAOFactory {
 	}
 
 	public static Connection getConnection() throws SQLException {
-		return DriverManager.getConnection(h2_connection_url, h2_user, h2_password);
+		JdbcConnectionPool connectionPool = JdbcConnectionPool.create(
+				h2_connection_url,
+				h2_user,
+				h2_password
+		);
+		connectionPool.setMaxConnections(30);
+
+		return connectionPool.getConnection();
 	}
 
 	public UserDAO getUserDAO() {
-		DbUtils.loadDriver(h2_driver);
-		return new UserDAOImpl();
+		return userDAO;
 	}
 
 	public AccountDAO getAccountDAO() {
-		DbUtils.loadDriver(h2_driver);
-		return new AccountDAOImpl();
+		return accountDAO;
 	}
 
 	@Override
