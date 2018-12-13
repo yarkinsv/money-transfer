@@ -15,14 +15,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class AccountDAOImpl implements AccountDAO {
 
   private static Logger log = Logger.getLogger(AccountDAOImpl.class);
   private final static String SQL_GET_ACC_BY_ID = "SELECT * FROM Account WHERE AccountId = ? ";
-  private final static String SQL_GET_ACC_BY_USER_ID = "SELECT * FROM Account WHERE UserName = ? AND CurrencyCode = ?";
+  private final static String SQL_GET_ACC_BY_USER_NAME = "SELECT * FROM Account WHERE UserName = ? AND CurrencyCode = ?";
   private final static String SQL_LOCK_ACC_BY_ID = "SELECT * FROM Account WHERE AccountId = ? FOR UPDATE";
   private final static String SQL_CREATE_ACC = "INSERT INTO Account (UserName, Balance, CurrencyCode) VALUES (?, ?, ?)";
   private final static String SQL_UPDATE_ACC_BALANCE = "UPDATE Account SET Balance = ? WHERE AccountId = ? ";
@@ -32,11 +31,11 @@ public class AccountDAOImpl implements AccountDAO {
   /**
    * Get all accounts.
    */
-  public Set<Account> getAllAccounts() throws CustomException {
+  public List<Account> getAllAccounts() throws CustomException {
     Connection conn = null;
     PreparedStatement stmt = null;
     ResultSet rs = null;
-    Set<Account> allAccounts = new HashSet<>();
+    List<Account> allAccounts = new LinkedList<>();
     try {
       conn = H2DAOFactory.getConnection();
       stmt = conn.prepareStatement(SQL_GET_ALL_ACC);
@@ -92,7 +91,7 @@ public class AccountDAOImpl implements AccountDAO {
     Account acc = null;
     try {
       conn = H2DAOFactory.getConnection();
-      stmt = conn.prepareStatement(SQL_GET_ACC_BY_USER_ID);
+      stmt = conn.prepareStatement(SQL_GET_ACC_BY_USER_NAME);
       stmt.setString(1, user);
       stmt.setString(2, currency);
       rs = stmt.executeQuery();
@@ -102,12 +101,17 @@ public class AccountDAOImpl implements AccountDAO {
         if (log.isDebugEnabled()) {
           log.debug("Retrieve Account By userId: " + acc);
         }
+        return acc;
       }
-      return getAllAccounts()
+      else
+      {
+          return null;
+      }
+      /*return getAllAccounts()
           .stream()
           .filter(account -> account.getUserName().equals(user) && account.getCurrencyCode().equals(currency))
           .findFirst()
-          .orElse(null);
+          .orElse(null);*/
     } catch (SQLException e) {
       throw new CustomException("getAccountById(): Error reading account data", e);
     } finally {
@@ -128,11 +132,13 @@ public class AccountDAOImpl implements AccountDAO {
       stmt.setString(1, account.getUserName());
       stmt.setBigDecimal(2, account.getBalance());
       stmt.setString(3, account.getCurrencyCode());
+
       int affectedRows = stmt.executeUpdate();
       if (affectedRows == 0) {
         log.error("createAccount(): Creating account failed, no rows affected.");
         throw new CustomException("Account Cannot be created");
       }
+
       generatedKeys = stmt.getGeneratedKeys();
       if (generatedKeys.next()) {
         return generatedKeys.getLong(1);

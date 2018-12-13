@@ -33,7 +33,7 @@ public class TestAccountDAO {
 
 	@Test
 	public void testGetAllAccounts() throws CustomException {
-		Set<Account> allAccounts = h2DaoFactory.getAccountDAO().getAllAccounts();
+		List<Account> allAccounts = h2DaoFactory.getAccountDAO().getAllAccounts();
 		assertTrue(allAccounts.size() > 1);
 	}
 

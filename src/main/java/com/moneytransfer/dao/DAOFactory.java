@@ -19,7 +19,7 @@ public abstract class DAOFactory {
 			return new H2DAOFactory();
 		default:
 			// by default using H2 in memory database
-			return new H2DAOFactory();
+			return new MapFactory();
 		}
 	}
 }

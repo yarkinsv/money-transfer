@@ -1,10 +1,13 @@
 package com.moneytransfer.service;
 
+import com.moneytransfer.dao.AccountDAO;
 import com.moneytransfer.dao.DAOFactory;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.Account;
 import com.moneytransfer.model.MoneyUtil;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 
@@ -23,7 +26,7 @@ import java.util.Set;
 @Consumes(MediaType.APPLICATION_JSON)
 public class AccountService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(0);
 
   private static Logger log = Logger.getLogger(AccountService.class);
 
@@ -36,7 +39,7 @@ public class AccountService {
   @GET
   @Path("/all")
   public Response getAllAccounts() throws CustomException {
-    Set<Account> account = daoFactory.getAccountDAO().getAllAccounts();
+    List<Account> account = daoFactory.getAccountDAO().getAllAccounts();
     return Response.ok("[" + account.stream().map(Account::toString).collect(Collectors.joining(",")) + "]").build();
   }
 
@@ -88,7 +91,10 @@ public class AccountService {
   @Path("/create")
   public Response createAccount(Account account) throws CustomException {
     final long accountId = daoFactory.getAccountDAO().createAccount(account);
-    return Response.ok(daoFactory.getAccountDAO().getAccountById(accountId).toString()).build();
+    AccountDAO dao = daoFactory.getAccountDAO();
+    Account acc = dao.getAccountById(accountId);
+    String str = acc.toString();
+    return Response.ok(str).build();
   }
 
   /**
@@ -150,4 +156,24 @@ public class AccountService {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
   }
+
+
+    //Вывод коллекции в строку без Stream API
+//    public static String listToString(List<Account> list) {
+//        Iterator<Account> iterator = list.iterator();
+//        if(!iterator.hasNext()){return"[]";}
+//        StringBuilder builder = new StringBuilder("[");
+//        while(true) {
+//            builder.append(iterator.next());
+//            if(iterator.hasNext()) {
+//                builder.append(",");
+//            }
+//            else {
+//                break;
+//            }
+//        }
+//        builder.append("]");
+//        return builder.toString();
+//    }
+
 }

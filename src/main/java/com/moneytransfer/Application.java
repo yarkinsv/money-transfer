@@ -12,6 +12,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -25,15 +26,15 @@ public class Application {
 	public static void main(String[] args) throws Exception {
 		// Initialize H2 database with demo data
 		log.info("Initialize demo .....");
-		DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+		DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(0);
 		h2DaoFactory.populateTestData();
-		log.info("Initialisation Complete....");
+        log.info("Initialisation Complete....");
 		// Host service on jetty
 		startService();
 	}
 
 	private static void startService() throws Exception {
-		Server server = new Server(new QueuedThreadPool(6, 1));
+		Server server = new Server(new QueuedThreadPool(6,1));
 		ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory());
 		connector.setPort(8080);
 		server.addConnector(connector);

@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class UserDAOImpl implements UserDAO {
@@ -22,7 +23,9 @@ public class UserDAOImpl implements UserDAO {
   private final static String SQL_UPDATE_USER = "UPDATE User SET UserName = ?, EmailAddress = ? WHERE UserId = ? ";
   private final static String SQL_DELETE_USER_BY_ID = "DELETE FROM User WHERE UserId = ? ";
 
-  private List<User> fetched = new ArrayList<>();
+  private final static String SQL_GET_MAX_ID = "SELECT MAX(UserId) from User";
+
+  //private List<User> fetched = new ArrayList<>();
 
   /**
    * Find all users
@@ -31,7 +34,7 @@ public class UserDAOImpl implements UserDAO {
     Connection conn = null;
     PreparedStatement stmt = null;
     ResultSet rs = null;
-    List<User> users = new ArrayList<User>();
+    List<User> users = new ArrayList<>();
     try {
       conn = H2DAOFactory.getConnection();
       stmt = conn.prepareStatement(SQL_GET_ALL_USERS);
@@ -42,7 +45,7 @@ public class UserDAOImpl implements UserDAO {
         if (log.isDebugEnabled())
           log.debug("getAllUsers() Retrieve User: " + u);
       }
-      fetched.addAll(users);
+      //fetched.addAll(users);
       return users;
     } catch (SQLException e) {
       throw new CustomException("Error reading user data", e);
@@ -109,10 +112,17 @@ public class UserDAOImpl implements UserDAO {
   public long insertUser(User user) throws CustomException {
     Connection conn = null;
     PreparedStatement stmt = null;
+    PreparedStatement idstmt = null;
+    ResultSet rs = null;
     try {
       conn = H2DAOFactory.getConnection();
+      long id = 0;
+      idstmt = conn.prepareStatement(SQL_GET_MAX_ID);
+      rs = idstmt.executeQuery();
+      if(rs.next()) {
+        id = rs.getLong(1)+1;
+      }
       stmt = conn.prepareStatement(SQL_INSERT_USER, Statement.RETURN_GENERATED_KEYS);
-      long id = getAllUsers().stream().mapToLong(User::getUserId).max().orElse(0) + 1;
       stmt.setLong(1,  id);
       stmt.setString(2, user.getUserName());
       stmt.setString(3, user.getEmailAddress());
@@ -126,7 +136,8 @@ public class UserDAOImpl implements UserDAO {
       log.error("Error Inserting User :" + user);
       throw new CustomException("Error creating user data", e);
     } finally {
-      DbUtils.closeQuietly(conn);
+      DbUtils.closeQuietly(conn,stmt,rs);
+      DbUtils.closeQuietly(idstmt);
     }
 
   }

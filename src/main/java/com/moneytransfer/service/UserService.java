@@ -5,6 +5,10 @@ import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.User;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,15 +27,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 
+import static com.moneytransfer.dao.DAOFactory.H2;
+
 @Path("/user")
 @Produces(MediaType.APPLICATION_JSON)
 public class UserService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(0);
 
   private static Logger log = Logger.getLogger(UserService.class);
 
-  private List<User> allUsers = new ArrayList<>();
+  ///private List<User> allUsers = new ArrayList<>();
 
   /**
    * Find by userName
@@ -62,7 +68,7 @@ public class UserService {
   @Path("/all")
   public Response getAllUsers() throws CustomException {
     List<User> users = daoFactory.getUserDAO().getAllUsers();
-    allUsers.addAll(users);
+    //allUsers.addAll(users);
     return Response.ok("[" + users.stream().map(User::toString).collect(Collectors.joining(",")) + "]").build();
   }
 
@@ -146,19 +152,14 @@ public class UserService {
   @Produces(MediaType.APPLICATION_SVG_XML)
   public Response getUserImage(@PathParam("userId") long userId) throws IOException {
     InputStream r = UserService.class.getClassLoader().getResourceAsStream("user.jpg");
-
-    byte[] img = new byte[0];
-    int read = r.read();
-    while (read != -1) {
-      byte[] img1 = new byte[img.length+1];
-      for (int i = 0; i < img.length; i++) {
-        img1[i] = img[i];
-      }
-      img1[img1.length-1] = (byte) read;
-      img = img1;
-      read = r.read();
+    URL url = UserService.class.getClassLoader().getResource("user.jpg");
+    byte[] img;
+    try {
+      img = Files.readAllBytes(Paths.get(url.toURI()));
+    }catch (URISyntaxException u)
+    {
+      throw new IOException("wrong resource name");
     }
-
     return Response.ok(img).header("hash", calcHashImg(img)).build();
   }
 
