@@ -34,10 +34,24 @@ public class User {
     return userName;
   }
 
+//Added by Isc 
+  public String setUserName(String new_UserName) {
+	userName=new_UserName;
+	return userName;
+  }
+//-----------------------
+
   public String getEmailAddress() {
-    return emailAddress;
+	return emailAddress;
   }
 
+ //Added by Isc 
+  public String setEmailAddress(String new_EmailAddress) {
+	emailAddress=new_EmailAddress;
+	return emailAddress;
+  }
+ //-----------------
+  
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
