@@ -1,3 +1,4 @@
+set -x
 recd="600s" # recording duration
 rdel="20s" # recording delay
 
@@ -21,7 +22,7 @@ rm ./*.plg
 
 stage=""
 gitline=`git log --oneline --decorate | grep HEAD`
-git_regex="tag: ([^,]*)"
+git_regex="tag: ([^,)]*)"
 if [[ $gitline =~ $git_regex ]]
 	then
 		stage="${BASH_REMATCH[1]}"
