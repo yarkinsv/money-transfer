@@ -38,9 +38,6 @@ java -XX:+UnlockCommercialFeatures \
 sleep 4
 jpid=$!
 echo "Java pid = $jpid"
-# timestamp=`date +%H-%M-%S`
-# jfrpath="rec_d-${recd}_s-${stage}_$timestamp.jfr"
-# logpath="log_d-${recd}_s-${stage}_$timestamp.plg"
 jfrpath="rec_d-${recd}_s-${stage}.jfr"
 logpath="log_d-${recd}_s-${stage}.plg"
 echo "JFR path: " `pwd`$jfrpath
