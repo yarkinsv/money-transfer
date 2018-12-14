@@ -43,7 +43,7 @@ jfrpath="rec_d-${recd}_s-${stage}.jfr"
 logpath="log_d-${recd}_s-${stage}.plg"
 echo "JFR path: " `pwd`$jfrpath
 echo "start at " `date +%H:%M:%S`
-jcmd $jpid JFR.start duration=$recd delay=$rdel filename="$jfrpath" &>/tmp/jcmd
+jcmd $jpid JFR.start duration=$recd delay=$rdel filename="$jfrpath" settings="flight-recorder.jfc" &>/tmp/jcmd
 python3 "run_tests.py" &>$logpath &
 ppid=$!
 echo "Python pid = $ppid"
