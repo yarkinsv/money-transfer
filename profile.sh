@@ -1,4 +1,4 @@
-recd="30s" # recording duration
+recd="600s" # recording duration
 rdel="20s" # recording delay
 
 lsofline=`lsof -i:8080 | grep java --color=never`
@@ -20,7 +20,7 @@ rm ./*.plg
 
 
 stage=""
-gitline=`git log --oneline --decorate`
+gitline=`git log --oneline --decorate | grep HEAD`
 git_regex="tag: ([^,]*)"
 if [[ $gitline =~ $git_regex ]]
 	then
@@ -41,7 +41,7 @@ echo "Java pid = $jpid"
 jfrpath="rec_d-${recd}_s-${stage}.jfr"
 logpath="log_d-${recd}_s-${stage}.plg"
 echo "JFR path: " `pwd`$jfrpath
-
+echo "start at " `date +%H:%M:%S`
 jcmd $jpid JFR.start duration=$recd delay=$rdel filename="$jfrpath" &>/tmp/jcmd
 python3 "run_tests.py" &>$logpath &
 ppid=$!
@@ -51,3 +51,4 @@ sleep $rdel
 sleep 10 # guard interval
 kill  $ppid
 kill  $jpid
+echo "ready"
