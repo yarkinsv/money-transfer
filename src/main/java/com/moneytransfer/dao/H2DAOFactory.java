@@ -38,12 +38,12 @@ public class H2DAOFactory extends DAOFactory {
 	}
 
 	public UserDAO getUserDAO() {
-		DbUtils.loadDriver(h2_driver);
+		//DbUtils.loadDriver(h2_driver); Commented by Isc
 		return new UserDAOImpl();
 	}
 
 	public AccountDAO getAccountDAO() {
-		DbUtils.loadDriver(h2_driver);
+		//DbUtils.loadDriver(h2_driver); Commented by Isc
 		return new AccountDAOImpl();
 	}
 
@@ -54,6 +54,9 @@ public class H2DAOFactory extends DAOFactory {
 		try {
 			conn = H2DAOFactory.getConnection();
 			RunScript.execute(conn, new FileReader("src/test/resources/demo.sql"));
+			//Added by Isc
+			accountDAO.getTestAccountsFromDB();
+			//------------------
 		} catch (SQLException e) {
 			log.error("populateTestData(): Error populating user data: ", e);
 			throw new RuntimeException(e);

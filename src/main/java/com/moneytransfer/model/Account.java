@@ -45,6 +45,12 @@ public class Account {
     return balance;
   }
 
+  public BigDecimal setBalance(BigDecimal new_balance) {
+	    balance=new_balance;
+	    return balance;
+	  }
+  
+  
   public String getCurrencyCode() {
     return currencyCode;
   }
@@ -64,7 +70,11 @@ public class Account {
 
   @Override
   public int hashCode() {
-    return 1;
+	  int result = (int) (accountId ^ (accountId >>> 32));
+	    result = 31 * result + userName.hashCode();
+	    result = 31 * result + currencyCode.hashCode();
+	    return result;	  
+//    return 1; commented by Isc
   }
 
   @Override
