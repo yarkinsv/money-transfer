@@ -49,7 +49,6 @@ fi
 java -XX:+UnlockCommercialFeatures \
 	 -XX:+FlightRecorder \
 	 -XX:+StartAttachListener \
-	 -agentlib:hprof=heap=dump,format=b,file="./heap.hprof" \
 	 -jar "./target/money-transfer-1.0.0-SNAPSHOT-shaded.jar" &>/tmp/money &
 sleep 5
 jpid=$!
