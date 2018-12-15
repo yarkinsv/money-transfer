@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 @Produces(MediaType.APPLICATION_JSON)
 public class UserService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.FAST);
   private final static Pattern EMAIL = Pattern.compile("(?=.{1,250}$)(.+)@(.+){2,}\\.(.+){2,}");
   private static Logger log = Logger.getLogger(UserService.class);
 
