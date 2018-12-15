@@ -1,5 +1,6 @@
 package com.moneytransfer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
@@ -8,6 +9,10 @@ import java.util.Objects;
 public class Account {
 
   private long accountId;
+
+  public void setAccountId(Long accountId) {
+    this.accountId = accountId;
+  }
 
   @JsonProperty(required = true)
   private String userName;
@@ -50,6 +55,14 @@ public class Account {
     return currencyCode;
   }
 
+  public void addToBalance(BigDecimal deltaAmount) {
+    this.balance = this.balance.add(deltaAmount);
+  }
+
+  public void subtractFromBalance(BigDecimal deltaAmount) {
+    this.balance = this.balance.subtract(deltaAmount);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -66,6 +79,11 @@ public class Account {
   @Override
   public int hashCode() {
     return Objects.hash(getAccountId());
+  }
+
+  @JsonIgnore
+  public int getUserAndCurrencyHash() {
+    return Objects.hash(getUserName() + getCurrencyCode());
   }
 
   @Override

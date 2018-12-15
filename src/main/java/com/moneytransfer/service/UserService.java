@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 @Produces(MediaType.APPLICATION_JSON)
 public class UserService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.NO_DB);
 
   private static Logger log = Logger.getLogger(UserService.class);
 

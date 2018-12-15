@@ -4,7 +4,6 @@ import com.moneytransfer.dao.impl.AccountDAOImpl;
 import com.moneytransfer.dao.impl.UserDAOImpl;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.utils.Utils;
-
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.log4j.Logger;
 import org.h2.jdbcx.JdbcConnectionPool;
@@ -13,7 +12,6 @@ import org.h2.tools.RunScript;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**

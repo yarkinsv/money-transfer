@@ -26,7 +26,7 @@ import static junit.framework.TestCase.assertTrue;
 public class TestAccountBalance {
 
 	private static Logger log = Logger.getLogger(TestAccountDAO.class);
-	private static final DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+	private static final DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.NO_DB);
 	private static final int THREADS_COUNT = 100;
 
 	@BeforeClass
@@ -112,6 +112,10 @@ public class TestAccountBalance {
 
 	@Test
 	public void testTransferFailOnDBLock() throws CustomException, SQLException {
+		if (!(h2DaoFactory instanceof H2DAOFactory)) {
+			return;
+		}
+
 		final String SQL_LOCK_ACC = "SELECT * FROM Account WHERE AccountId = 5 FOR UPDATE";
 		Connection conn = null;
 		PreparedStatement lockStmt = null;
