@@ -1,14 +1,3 @@
-mvn clean install
-
-if [[ $? -eq 0 ]]
-	then
-		echo "maven install ok"
-else
-	echo "maven failed!"
-	exit 1
-fi	
-
-
 set -x
 recd="600" # recording duration
 rdel="10" # recording delay
@@ -20,6 +9,16 @@ if [[ $* == *--clear* ]]
 		rm ./*.jfr
 		rm ./*.plg
 		rm ./*.hprof
+
+		mvn clean install
+		if [[ $? -eq 0 ]]
+			then
+				echo "maven install ok"
+		else
+			echo "maven failed!"
+			exit 1
+		fi			
+
 		exit 0
 fi
 
