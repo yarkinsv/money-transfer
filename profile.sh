@@ -62,6 +62,17 @@ echo "Python pid = $ppid"
 
 sleep $(expr $rdel + 10)
 
+ps -p $ppid
+psres=$?
+if [[ psres -eq 0 ]]
+	then
+		echo "payload ok"
+else
+	echo "PAYLOAD IS NOT RUNNING!"
+	exit 1
+fi	
+
+
 if [[ $* == *--dump* ]]
 	then
 		count=0
