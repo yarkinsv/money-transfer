@@ -6,6 +6,10 @@ import com.moneytransfer.service.ServiceExceptionMapper;
 import com.moneytransfer.service.TransactionService;
 import com.moneytransfer.service.UserService;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
@@ -23,10 +27,23 @@ public class Application {
 	private static Logger log = Logger.getLogger(Application.class);
 
 	public static void main(String[] args) throws Exception {
-		// Initialize H2 database with demo data
+		Options options = new Options();
+		options.addOption("f", true, "Factory code (H2, NoDB, etc), case-insensitive");
+		CommandLineParser parser = new DefaultParser();
+		CommandLine cmd = parser.parse(options, args);
+		int factoryCode = -1;
+		if (cmd.hasOption("f")) {
+			String factoryCodeString = cmd.getOptionValue("f");
+			if (factoryCodeString.equalsIgnoreCase("h2"))
+				factoryCode = DAOFactory.H2;
+			else if (factoryCodeString.equalsIgnoreCase("nodb"))
+				factoryCode = DAOFactory.NODB;
+		}
+		// Initialize database with demo data
 		log.info("Initialize demo .....");
-		DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
-		h2DaoFactory.populateTestData();
+		DAOFactory.setFactoryCode(factoryCode);
+		DAOFactory DaoFactory = DAOFactory.getDAOFactory();
+		DaoFactory.populateTestData();
 		log.info("Initialisation Complete....");
 		// Host service on jetty
 		startService();

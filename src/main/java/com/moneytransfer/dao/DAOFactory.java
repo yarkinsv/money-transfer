@@ -1,10 +1,13 @@
 package com.moneytransfer.dao;
 
+import java.util.HashMap;
+
 import com.moneytransfer.exception.CustomException;
 
 public abstract class DAOFactory {
 
 	public static final int H2 = 1;
+	public static final int NODB = 2;
 
 	public abstract UserDAO getUserDAO();
 
@@ -12,22 +15,28 @@ public abstract class DAOFactory {
 
 	public abstract void populateTestData() throws CustomException;
 
-    private static H2DAOFactory h2DAOFactory = null;
-    private static DAOFactory getH2DAOFactory(){
-        if (h2DAOFactory == null)
-            h2DAOFactory = new H2DAOFactory();
-        return h2DAOFactory;
-    }
+	private static final HashMap<Integer, DAOFactory> daoFactories = new HashMap<>();
+	private static Integer factoryCode = null;
 
+	public static DAOFactory getDAOFactory() {
+		if (factoryCode == null) setFactoryCode(H2);
+		return daoFactories.get(factoryCode);
+	}
 
-	public static DAOFactory getDAOFactory(int factoryCode) {
-
-		switch (factoryCode) {
-		case H2:
-			return getH2DAOFactory();
-		default:
-			// by default using H2 in memory database
-			return getH2DAOFactory();
-		}
+	public static void setFactoryCode(int factoryCode) {
+		DAOFactory.factoryCode = new Integer(factoryCode);
+		DAOFactory daoFactory = daoFactories.get(factoryCode);
+		if (daoFactory == null)
+			switch (factoryCode) {
+			case H2:
+				daoFactory = new H2DAOFactory();
+				daoFactories.put(factoryCode, daoFactory);
+			case NODB:
+				daoFactory = new NoDBDAOFactory();
+				daoFactories.put(factoryCode, daoFactory);
+			default:
+				// by default using H2 in memory database
+				DAOFactory.setFactoryCode(H2);
+			}
 	}
 }

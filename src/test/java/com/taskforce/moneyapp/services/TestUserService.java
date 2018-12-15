@@ -18,7 +18,7 @@ import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertTrue;
 
-public class TestUserService extends TestService {
+public abstract class TestUserService extends TestService {
 
   @Test
   public void testGetUser() throws IOException, URISyntaxException {

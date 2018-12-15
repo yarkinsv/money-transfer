@@ -10,7 +10,6 @@ import com.moneytransfer.model.UserTransaction;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -23,17 +22,17 @@ import java.util.concurrent.CountDownLatch;
 
 import static junit.framework.TestCase.assertTrue;
 
-public class TestAccountBalance {
+public abstract class TestAccountBalance {
 
 	private static Logger log = Logger.getLogger(TestAccountDAO.class);
-	private static final DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+	private static DAOFactory daoFactory;
 	private static final int THREADS_COUNT = 100;
 
-	@BeforeClass
 	public static void setup() throws CustomException {
+		daoFactory = DAOFactory.getDAOFactory();
 		// prepare test database and test data, Test data are initialised from
 		// src/test/resources/demo.sql
-		h2DaoFactory.populateTestData();
+		daoFactory.populateTestData();
 	}
 
 	@After
@@ -44,7 +43,7 @@ public class TestAccountBalance {
 	@Test
 	public void testAccountSingleThreadSameCcyTransfer() throws CustomException {
 
-		final AccountDAO accountDAO = h2DaoFactory.getAccountDAO();
+		final AccountDAO accountDAO = daoFactory.getAccountDAO();
 
 		BigDecimal transferAmount = new BigDecimal(50.01234).setScale(4, RoundingMode.HALF_EVEN);
 
@@ -73,7 +72,7 @@ public class TestAccountBalance {
 
 	@Test
 	public void testAccountMultiThreadedTransfer() throws InterruptedException, CustomException {
-		final AccountDAO accountDAO = h2DaoFactory.getAccountDAO();
+		final AccountDAO accountDAO = daoFactory.getAccountDAO();
 		// transfer a total of 200USD from 100USD balance in multi-threaded
 		// mode, expect half of the transaction fail
 		final CountDownLatch latch = new CountDownLatch(THREADS_COUNT);
@@ -139,7 +138,7 @@ public class TestAccountBalance {
 			BigDecimal transferAmount = new BigDecimal(50).setScale(4, RoundingMode.HALF_EVEN);
 
 			UserTransaction transaction = new UserTransaction("GBP", transferAmount, 6L, 5L);
-			h2DaoFactory.getAccountDAO().transferAccountBalance(transaction);
+			daoFactory.getAccountDAO().transferAccountBalance(transaction);
 			conn.commit();
 		} catch (Exception e) {
 			log.error("Exception occurred, initiate a rollback");
@@ -157,8 +156,8 @@ public class TestAccountBalance {
 
 		// now inspect account 3 and 4 to verify no transaction occurred
 		BigDecimal originalBalance = new BigDecimal(500).setScale(4, RoundingMode.HALF_EVEN);
-		assertTrue(h2DaoFactory.getAccountDAO().getAccountById(6).getBalance().equals(originalBalance));
-		assertTrue(h2DaoFactory.getAccountDAO().getAccountById(5).getBalance().equals(originalBalance));
+		assertTrue(daoFactory.getAccountDAO().getAccountById(6).getBalance().equals(originalBalance));
+		assertTrue(daoFactory.getAccountDAO().getAccountById(5).getBalance().equals(originalBalance));
 	}
 
 }

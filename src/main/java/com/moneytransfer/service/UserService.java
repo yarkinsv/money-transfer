@@ -5,7 +5,6 @@ import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.User;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -27,7 +26,7 @@ import org.apache.log4j.Logger;
 @Produces(MediaType.APPLICATION_JSON)
 public class UserService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final DAOFactory daoFactory = DAOFactory.getDAOFactory();
 
   private static Logger log = Logger.getLogger(UserService.class);
 
