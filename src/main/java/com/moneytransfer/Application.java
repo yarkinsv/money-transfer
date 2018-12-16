@@ -33,7 +33,7 @@ public class Application {
 	}
 
 	private static void startService() throws Exception {
-		Server server = new Server(new QueuedThreadPool(50, 8));
+		Server server = new Server(new QueuedThreadPool(30, 8));
 		ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory());
 		connector.setPort(8080);
 		server.addConnector(connector);

@@ -4,14 +4,17 @@ import com.moneytransfer.dao.impl.AccountDAOImpl;
 import com.moneytransfer.dao.impl.UserDAOImpl;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.utils.Utils;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.log4j.Logger;
-import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.tools.RunScript;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
@@ -27,20 +30,23 @@ public class H2DAOFactory extends DAOFactory {
 	private static final UserDAOImpl userDAO = new UserDAOImpl();
 	private static final AccountDAOImpl accountDAO = new AccountDAOImpl();
 
+	private static HikariDataSource hikariDataSource;
+
 	static  {
 		// init: load driver
 		DbUtils.loadDriver(h2_driver);
+		HikariConfig config = new HikariConfig();
+		config.setJdbcUrl(h2_connection_url);
+		config.setUsername(h2_user);
+		config.setPassword(h2_password);
+		config.addDataSourceProperty( "cachePrepStmts" , "true" );
+		config.addDataSourceProperty( "prepStmtCacheSize" , "250" );
+		config.addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" );
+		hikariDataSource = new HikariDataSource(config);
 	}
 
 	public static Connection getConnection() throws SQLException {
-		JdbcConnectionPool connectionPool = JdbcConnectionPool.create(
-				h2_connection_url,
-				h2_user,
-				h2_password
-		);
-		connectionPool.setMaxConnections(30);
-
-		return connectionPool.getConnection();
+		return hikariDataSource.getConnection();
 	}
 
 	public UserDAO getUserDAO() {
