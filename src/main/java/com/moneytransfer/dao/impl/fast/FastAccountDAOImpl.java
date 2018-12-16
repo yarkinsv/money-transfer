@@ -65,7 +65,7 @@ public class FastAccountDAOImpl implements AccountDAO {
 
 	@Override
 	public long createAccount(Account account) throws CustomException {
-		if (userIndex.containsKey(new UserCurrencyPair(account))){
+		if (userIndex.containsKey(new UserCurrencyPair(account))) {
 			return 0;
 		}
 		index++;
@@ -98,16 +98,44 @@ public class FastAccountDAOImpl implements AccountDAO {
 	}
 
 	@Override
-	public int transferAccountBalance(UserTransaction userTransaction) throws CustomException {
+	// TODO synchronize carefully
+	public synchronized int transferAccountBalance(UserTransaction userTransaction) throws CustomException {
 		Long fromId = userTransaction.getFromAccountId();
 		Account accountFrom = accountRepository.get(fromId);
 
 		Long toId = userTransaction.getToAccountId();
 		Account accountTo = accountRepository.get(toId);
 
+		Account first;
+		Account second;
+		if (accountFrom.getAccountId() > accountTo.getAccountId()) {
+			first = accountFrom;
+			second = accountTo;
+		} else {
+			first = accountTo;
+			second = accountFrom;
+		}
+
+		// check transaction currency
+		if (!accountFrom.getCurrencyCode().equals(userTransaction.getCurrencyCode())) {
+			throw new CustomException(
+					"Fail to transfer Fund, transaction ccy are different from source/destination");
+		}
+
+		// check ccy is the same for both accounts
+		if (!accountFrom.getCurrencyCode().equals(accountTo.getCurrencyCode())) {
+			throw new CustomException(
+					"Fail to transfer Fund, the source and destination account are in different currency");
+		}
+
 		updateAccountBalance(fromId, userTransaction.getAmount().negate());
 		updateAccountBalance(toId, userTransaction.getAmount());
 		return 2;
+	}
 
+	public void dropTable() {
+		accountRepository = new ConcurrentHashMap<>();
+		userIndex = new ConcurrentHashMap<>();
+		index = 0L;
 	}
 }

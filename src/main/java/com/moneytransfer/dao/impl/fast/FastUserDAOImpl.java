@@ -29,6 +29,9 @@ public class FastUserDAOImpl implements UserDAO {
 	@Override
 	public User getUserByName(String userName) throws CustomException {
 		Long index = userNamesIndex.get(userName);
+		if (index==null){
+			return null;
+		}
 		return userRepository.get(index);
 	}
 
@@ -56,5 +59,11 @@ public class FastUserDAOImpl implements UserDAO {
 		}
 		userNamesIndex.remove(prev.getUserName());
 		return 1;
+	}
+
+	public void dropTable(){
+		userRepository = new ConcurrentHashMap<>();
+		userNamesIndex = new ConcurrentHashMap<>();
+		index = 0L;
 	}
 }

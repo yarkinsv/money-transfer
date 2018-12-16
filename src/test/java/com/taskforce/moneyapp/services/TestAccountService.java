@@ -51,7 +51,7 @@ public class TestAccountService extends TestService {
     HttpGet request = new HttpGet(uri);
     HttpResponse response = client.execute(request);
     int statusCode = response.getStatusLine().getStatusCode();
-    assertEquals200, statusCode);
+    assertEquals(200, statusCode);
     String balance = EntityUtils.toString(response.getEntity());
     BigDecimal res = new BigDecimal(balance).setScale(4, RoundingMode.HALF_EVEN);
     BigDecimal db = new BigDecimal(100).setScale(4, RoundingMode.HALF_EVEN);
