@@ -4,6 +4,8 @@ import com.moneytransfer.exception.CustomException;
 
 public abstract class DAOFactory {
 
+	private static final H2DAOFactory h2DaoFactory  = new H2DAOFactory();
+
 	public static final int H2 = 1;
 
 	public abstract UserDAO getUserDAO();
@@ -16,10 +18,10 @@ public abstract class DAOFactory {
 
 		switch (factoryCode) {
 		case H2:
-			return new H2DAOFactory();
+			return h2DaoFactory;
 		default:
 			// by default using H2 in memory database
-			return new H2DAOFactory();
+			return h2DaoFactory;
 		}
 	}
 }
