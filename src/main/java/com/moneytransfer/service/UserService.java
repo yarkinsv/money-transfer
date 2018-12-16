@@ -64,7 +64,14 @@ public class UserService {
   @Path("/all")
   public Response getAllUsers() throws CustomException {
     List<User> users = daoFactory.getUserDAO().getAllUsers();
-    return Response.ok("[" + users.stream().map(User::toString).collect(Collectors.joining(",")) + "]").build();
+    StringBuilder sb = new StringBuilder("[");
+    for (User u : users){
+      sb.append(u);
+      sb.append(",");
+    }
+    sb.deleteCharAt(sb.length()-1);
+    sb.append("]");
+    return Response.ok(sb.toString()).build();
   }
 
   /**

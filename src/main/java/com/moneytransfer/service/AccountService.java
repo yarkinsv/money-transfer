@@ -36,8 +36,15 @@ public class AccountService {
   @GET
   @Path("/all")
   public Response getAllAccounts() throws CustomException {
-    Set<Account> account = daoFactory.getAccountDAO().getAllAccounts();
-    return Response.ok("[" + account.stream().map(Account::toString).collect(Collectors.joining(",")) + "]").build();
+    Set<Account> accounts = daoFactory.getAccountDAO().getAllAccounts();
+    StringBuilder sb = new StringBuilder("[");
+    for(Account acc : accounts){
+      sb.append(acc.toString());
+      sb.append(",");
+    }
+    sb.deleteCharAt(sb.length()-1);
+    sb.append("]");
+    return Response.ok(sb.toString()).build();
   }
 
   /**
