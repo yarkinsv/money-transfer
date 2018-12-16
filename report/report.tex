@@ -49,10 +49,10 @@
 		В репозитории  \href{https://github.com/eremeykin/hh-jvm/}{hh-jvm} есть четыре ветки:
 		\begin{itemize}
 			 \item \texttt{master} - ветка исходного репозитория \href{https://github.com/yarkinsv/money-transfer}{money-transfer}
-			 \item \texttt{automation} - ветка автоматизации профилирования, тут созданы файлы \texttt{profile.sh} скрипт автоматизирующий профилирование, 
-			 \item \texttt{flight-recorder.jfc} файл с настройками для FlightRecorder и \texttt{analyze.py} файл для анализа вывода скрипта \texttt{run\_tests.py}
+			 \item \texttt{automation} - ветка автоматизации профилирования, тут созданы файлы \texttt{profile.sh} скрипт автоматизирующий профилирование,
+			  \texttt{flight-recorder.jfc} файл с настройками для FlightRecorder и \texttt{analyze.py} файл для анализа вывода скрипта \texttt{run\_tests.py}
 			 \item \texttt{develop} - ветка с изменениями в java коде для улучшения производительности.
-			 \item \texttt{report} - ветка с этим отчётом			 
+			 \item \texttt{report} - ветка с отчётом			 
 		\end{itemize}
 
 		Стадии экспериментов помечены тегами \texttt{stage\_<\#стадии>}. Дампы памяти и записи параметров на github не выложены, они знимают много места.
@@ -70,10 +70,10 @@
 	\subsection*{Инструменты}
 		Для замеров используются следующие инструменты:
 		\begin{itemize}
-			\item Cамописный bash скрипт `profile.sh` для автоматизации замеров и обеспечения хотябы небольшой степени воспроизводимости экспериментов.
-			\item Cамописный python скрипт `analyze.py` для построения графика времени выполнения сценария 1.
-			\item \href{https://docs.oracle.com/javacomponents/jmc-5-5/jfr-runtime-guide/about.html}{FlightRecorder} для записи `jfr` файлов с различными измеряемыми параметрами, перечисленными в файле `flight-recorder.jfc`
-			\item \href{https://www.oracle.com/technetwork/java/javaseproducts/mission-control/index.html}{Java Mission Control} для анализа `jfr` файлов. Файлы `jfr` объемные и в репозиторий не входят.
+			\item Cамописный bash скрипт \texttt{profile.sh} для автоматизации замеров и обеспечения хотябы небольшой степени воспроизводимости экспериментов.
+			\item Cамописный python скрипт \texttt{analyze.py} для построения графика времени выполнения сценария 1.
+			\item \href{https://docs.oracle.com/javacomponents/jmc-5-5/jfr-runtime-guide/about.html}{FlightRecorder} для записи \texttt{jfr} файлов с различными измеряемыми параметрами, перечисленными в файле \texttt{flight-recorder.jfc}
+			\item \href{https://www.oracle.com/technetwork/java/javaseproducts/mission-control/index.html}{Java Mission Control} для анализа \texttt{jfr} файлов. Файлы \texttt{jfr} объемные и в репозиторий не входят.
 			\item \href{https://docs.oracle.com/javase/8/docs/technotes/tools/unix/jmap.html}{jmap} для сохранения бинарный дампов памяти. Дампы большие, в репозиторий не входят.
 			\item \href{https://docs.oracle.com/javase/8/docs/technotes/guides/visualvm/index.html}{jvisualvm} для анализа дампов памяти и фильтарции объектов по пакету
 		\end{itemize}
@@ -83,9 +83,9 @@
 		\begin{itemize}
 			\item На сколько загружен CPU - оценивается по записям FlightRecorder
 			\item Сколько в среднем потребляется памяти, заметен ли в программе memory leak - оценивается по записям FlightRecorder
-			\item Как часто происходит сборка мусора - оценивается по записям FlightRecorder, тут же оцениваются дампы памяти `.hprof` с помощью jvisualvm
-			\item Сколько в среднем выполняется запуск сценария 1, как быстро увеличивается это время - оценивается по графику, построенному с помошью `analyze.py` 
-			\item Какие операции из значимых (т.е. без учета работы системных функций, в т.ч. веб сервера) занимают больше всего процессорного времени - оценивается по записям FlightRecorder
+			\item Как часто происходит сборка мусора - оценивается по записям FlightRecorder, тут же оцениваются дампы памяти \texttt{.hprof} с помощью jvisualvm
+			\item Сколько в среднем выполняется запуск сценария 1, как быстро увеличивается это время - оценивается по графику, построенному с помошью \texttt{analyze.py} 
+			\item Какие операции из значимых (т.е. без учёта работы системных функций, в т.ч. веб сервера) занимают больше всего процессорного времени - оценивается по записям FlightRecorder
 		\end{itemize}
 	
 	\subsection*{Методика}
@@ -94,20 +94,21 @@
 	\texttt{./profile.sh --clear \&\& ./profile.sh --dump \&\& sleep 30 \&\& ./profile.sh}
 
 		\begin{itemize}
-			\item \texttt{./profile.sh --clear} чистит старые дампы и texttt{jfr} файлы и делает texttt{mvn clean install}
-			\item \texttt{./profile.sh --dump} запускает jar-ник и раз в 2 мин делает дамп через texttt{jmap} в течении 10 мин
-			\item \texttt{./profile.sh} - записывает jfr файл в течении 10 мин с помощью FlightRecorder и JMC .
+			\item \texttt{./profile.sh --clear} --- чистит старые дампы и \texttt{jfr} файлы и делает texttt{mvn clean install}
+			\item \texttt{./profile.sh --dump} --- запускает jar-ник и раз в 2 мин делает дамп через texttt{jmap} в течении 10 мин
+			\item \texttt{./profile.sh} --- записывает \texttt{jfr} файл в течении 10 мин с помощью FlightRecorder и JMC .
 		\end{itemize}
 
 	Таким образом, сохранение дампов и запись jfr файлов происходит на разных запусках jar-ника.
 
 	После выполнения скрипта получаем файлы:
 		\begin{itemize}
-			\item два \texttt{jfr} - один тот, в процессе записи которого не создавались дампы, а второй записывался одновременно с созданием дампов. Для анализа интересен первый
-			\item два \texttt{plg} файла, это файлы output потока python скрипта \texttt{run\_test.py}, в который мы ещё добавили время для каждой итерации. Их также два так как один во время "чистого" прогона, а второй во время сохранения дампов памяти. Интересен первый. 
-			\item дампы памяти, их как правило 5, так как 10 минут пишем через каждые 2 мин. Анализируем средний, третий, созданный через 6 мин после начала записи 
+			\item два \texttt{jfr} файла --- один тот, в процессе записи которого не создавались дампы, а второй записывался одновременно с созданием дампов. Для анализа интересен первый
+			\item два \texttt{plg} файла --- файлы output потока python скрипта \texttt{run\_test.py}, в который ещё добавлено время для каждой итерации. Один во время "чистого" прогона, а второй во время сохранения дампов памяти. Интересен первый. 
+			\item 5 дампов памяти, так как их пишем через каждые 2 мин в течении 10 минут . Анализируем средний, третий, созданный через 6 мин после начала записи.
 		\end{itemize}
-	Полученные файлы анализируются с помощью jvisualvm (для дампов) и JMC (для .jfr), а также самописным python скриптом `analyze.py`(для построения графика времени выполнения сценария 1 по .plg файлу)
+	Полученные файлы анализируются с помощью jvisualvm (для дампов) и JMC (для \texttt{jfr}), 
+	а также самописным python скриптом \texttt{analyze.py} (для построения графика времени выполнения сценария 1 по \texttt{plg} файлу)
 
 
 	\section*{Стадия 0}
@@ -117,7 +118,7 @@
 		\newpage
 		\item \textit{На сколько загружен CPU?}
 		
-		Анализируем загрузку CPU из записанного jfr файла. Она в среднем составляет 23\%. 
+		Анализируем загрузку CPU из записанного \texttt{jfr} файла. Она в среднем составляет 23\%. 
 		\begin{figure}[h!] % \ContinuedFloat
 			\centering
 			\includegraphics[width=0.95\linewidth]{img/stage_0/cpu.png}
@@ -153,7 +154,7 @@
 		\item \textit{Сколько в среднем выполняется запуск сценария 1, как быстро увеличивается это время?}
 		
 		На графике показано среднее время \texttt{Execution time average} и текщее время \texttt{Execution time last} в секундах зависимости от числа выполнения сценария 1 \texttt{Function play\_scenario\_1 called}. 
-		Текущее время выросло с 0.03 с до  0.4с за 3850 выполнений сценария.
+		Текущее время выросло с 0.03 с до  0.4 с за 3850 выполнений сценария.
 		
 		\begin{figure}[h!] % \ContinuedFloat
 			\centering
@@ -188,10 +189,20 @@
 	\section*{Стадия 1}
 		При анализе найдено, что
 	\begin{enumerate}
-		\item Можно переиспользовать \texttt{DAOImpl} так как это объекты без состояния
-		\item Есть утечка памяти, когда в объекте \texttt{UserDAOImpl} сохраняются неиспользуемые объекты \texttt{User}
+		\item \texttt{9b81cd4} В классе есть \texttt{UserDAOImpl} есть неиспользуемое поле \texttt{fatched} 
+		\item \texttt{fa418f8} Объекты типа \texttt{DAO} можно переиспользовать, не создавая заново новые объекты, так как они не имеют состояния 
+		\item \texttt{501dd00} В классе \texttt{UserTransaction} в методе \texttt{equals()} можно переупорядочить порядок сравнения полей
+		\item \texttt{e9eed2d} Обнаружена ещё одна утечка памяти, экземпляры \texttt{Pattern} можно переиспользовать
+		\item \texttt{d78be31} В методах \texttt{getDAO} можно убрать \texttt{loadDriver}
+		\item \texttt{42a5108} В классе \texttt{Account} \texttt{hashCode} возвращал константу
+		\item \texttt{d6ee875} В методе \texttt{getAccountByUser()} неправильно возвращается значение
+		\item \texttt{9cb79c3} В таблице \texttt{User} можно установить \texttt{AUTO\_INCREMENT} и возвращать значение, сгенерированное базой данных
+		\item \texttt{83dd1f1} Можно переиспользовать объекты \texttt{H2DAOFactory}
+		\item \texttt{68a205b} Переписаны методы \texttt{getAllAccounts} и \texttt{getAllUsers} для использования \texttt{StringBuilder} (не уверен, не будет ли старая реализация создавать и соединять лишние строки)
 	\end{enumerate}		
 
+
+	\newpage
 
 	\begin{itemize}
 		
@@ -245,8 +256,7 @@
 		\newpage
 		\item \textit{Какие операции из значимых (т.е. без учёта работы системных функций, в т.ч. веб сервера) занимают больше всего процессорного времени?}
 		
-		Семплирование, применённое при записи, имеет ограниченную точность и общее число вызова значимых функций не велико, 
-		в основном процессор выполняет функции из jdk или веб сервера, но оценить узкие места можно при помощи таблицы: 
+		Статистика использования методов изменилась не сильно, возможно она зависит только от характера загрузки сервера.
 		
 		\begin{figure}[h!] % \ContinuedFloat
 			\centering
