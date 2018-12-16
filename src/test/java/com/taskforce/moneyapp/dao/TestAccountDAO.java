@@ -17,12 +17,11 @@ import static junit.framework.TestCase.assertTrue;
 
 public class TestAccountDAO {
 
-	private static final DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+	private static final DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.NO_DB);
 
 	@BeforeClass
 	public static void setup() throws CustomException {
-		// prepare test database and test data. Test data are initialised from
-		// src/test/resources/demo.sql
+		// prepare test database and test data.
 		h2DaoFactory.populateTestData();
 	}
 

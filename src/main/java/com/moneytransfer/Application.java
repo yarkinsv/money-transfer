@@ -25,7 +25,7 @@ public class Application {
 	public static void main(String[] args) throws Exception {
 		// Initialize H2 database with demo data
 		log.info("Initialize demo .....");
-		DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+		DAOFactory h2DaoFactory = DAOFactory.getDAOFactory(DAOFactory.NO_DB);
 		h2DaoFactory.populateTestData();
 		log.info("Initialisation Complete....");
 		// Host service on jetty
@@ -33,7 +33,7 @@ public class Application {
 	}
 
 	private static void startService() throws Exception {
-		Server server = new Server(new QueuedThreadPool(6, 1));
+		Server server = new Server(new QueuedThreadPool(30, 8));
 		ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory());
 		connector.setPort(8080);
 		server.addConnector(connector);

@@ -5,6 +5,8 @@ import com.moneytransfer.dao.impl.UserDAOImpl;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.utils.Utils;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.log4j.Logger;
 import org.h2.tools.RunScript;
@@ -28,23 +30,31 @@ public class H2DAOFactory extends DAOFactory {
 	private static final UserDAOImpl userDAO = new UserDAOImpl();
 	private static final AccountDAOImpl accountDAO = new AccountDAOImpl();
 
+	private static HikariDataSource hikariDataSource;
+
 	static  {
 		// init: load driver
 		DbUtils.loadDriver(h2_driver);
+		HikariConfig config = new HikariConfig();
+		config.setJdbcUrl(h2_connection_url);
+		config.setUsername(h2_user);
+		config.setPassword(h2_password);
+		config.addDataSourceProperty( "cachePrepStmts" , "true" );
+		config.addDataSourceProperty( "prepStmtCacheSize" , "250" );
+		config.addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" );
+		hikariDataSource = new HikariDataSource(config);
 	}
 
 	public static Connection getConnection() throws SQLException {
-		return DriverManager.getConnection(h2_connection_url, h2_user, h2_password);
+		return hikariDataSource.getConnection();
 	}
 
 	public UserDAO getUserDAO() {
-		DbUtils.loadDriver(h2_driver);
-		return new UserDAOImpl();
+		return userDAO;
 	}
 
 	public AccountDAO getAccountDAO() {
-		DbUtils.loadDriver(h2_driver);
-		return new AccountDAOImpl();
+		return accountDAO;
 	}
 
 	@Override

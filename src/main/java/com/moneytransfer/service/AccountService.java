@@ -23,7 +23,7 @@ import java.util.Set;
 @Consumes(MediaType.APPLICATION_JSON)
 public class AccountService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.NO_DB);
 
   private static Logger log = Logger.getLogger(AccountService.class);
 
@@ -36,8 +36,8 @@ public class AccountService {
   @GET
   @Path("/all")
   public Response getAllAccounts() throws CustomException {
-    Set<Account> account = daoFactory.getAccountDAO().getAllAccounts();
-    return Response.ok("[" + account.stream().map(Account::toString).collect(Collectors.joining(",")) + "]").build();
+    Set<Account> accounts = daoFactory.getAccountDAO().getAllAccounts();
+    return Response.ok(accounts).build();
   }
 
   /**
