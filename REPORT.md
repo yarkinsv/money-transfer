@@ -11,8 +11,8 @@
 | Java          | Java(TM) SE Runtime Environment (build 1.8.0_144-b01)|
 | JVM           | Java HotSpot(TM) 64-Bit Server VM (build 25.144-b01, mixed mode)|
 | JMC           | 5.5.1                                    |
-| jmap          | из JDK 1.8.0_144                                        |
-|maven        | 3.3.9                                       |
+| jmap          | из JDK 1.8.0_144                         |
+|maven          | 3.3.9                                    |
 
 ### Репозиторий.
 В репозитории [hh-jvm](https://github.com/eremeykin/hh-jvm/) есть три ветки:
@@ -63,14 +63,14 @@
 
 * *На сколько загружен CPU?*
 В среднем около 25%:
-![image](https://user-images.githubusercontent.com/7558836/50046075-5280e800-00ae-11e9-914f-82a2fb50d00f.png)
-
+![cpu](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_0/cpu.png)
 
 * *Сколько в среднем потребляется памяти, заметен ли в программе memory leak?*
 От 55 Мб до 130Мб:
-![image](https://user-images.githubusercontent.com/7558836/50046088-82c88680-00ae-11e9-98b4-304054411a2f.png)
+![memory](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_0/memory.png)
+
 Дамп №3 
-![image](https://user-images.githubusercontent.com/7558836/50046133-3893d500-00af-11e9-9f37-850fd08592b5.png)
+![dump3](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_0/dump3.png)
 Заметим, что создано несколько объектов типа `*DAOImpl` и довольно  много объектов `Account` и `User`.
 
 * *Как часто происходит сборка мусора?*
@@ -78,11 +78,11 @@
 
 * *Cколько в среднем выполняется запуск сценария 1, как быстро увеличивается это время?*
 На графике показано среднее время `Execution time average` и текщее время `Execution time last` в секундах зависимости от числа выполнения сценария 1 `Function play_scenario_1 called`. 
-![image](https://user-images.githubusercontent.com/7558836/50046204-a260ae80-00b0-11e9-9f6b-f76c0da82da0.png)
+![pyplot](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_0/pyplot.png)
 
 
 * *Какие операции из значимых (т.е. без учета работы системных функций, в т.ч. веб сервера) занимают больше всего процессорного времени?*
-![image](https://user-images.githubusercontent.com/7558836/50046234-3df21f00-00b1-11e9-9f2a-25e89fe12636.png)
+![hotmethods](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_0/hotmethods.png)
 
 * **ВЫВОДЫ СТАДИИ 0**
 1) Проверить как создаются и куда сохраняются объекты `Account` и `User`.
@@ -96,30 +96,27 @@
 Проверяем как исправления повлияют на результат. 
 
 * *На сколько загружен CPU?*
-Загрузка примерно такая же
-![image](https://user-images.githubusercontent.com/7558836/50046260-e86a4200-00b1-11e9-98e7-b53b15058848.png)
-
+В среднем около 25%:
+![cpu](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_1/cpu.png)
 
 * *Сколько в среднем потребляется памяти, заметен ли в программе memory leak?*
-![image](https://user-images.githubusercontent.com/7558836/50046263-06d03d80-00b2-11e9-8461-0b59ace423fd.png)
+От 55 Мб до 130Мб:
+![memory](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_1/memory.png)
+
 Дамп №3 
-![image](https://user-images.githubusercontent.com/7558836/50046271-2cf5dd80-00b2-11e9-942a-750e94edf323.png)
-
-
-Хотя бы тут есть какая-то польза! Сразу **заметно сократилось число обоъектов**, как `DAOImpl`,  так и моделей `Account` и `User`. Возможно время сбора дампа пришлось после сборки мусора? 
-
-Да, тут моделей больше, но от `DAOImpl` мы избавились.
+![dump3](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_1/dump3.png)
+Заметим, что создано несколько объектов типа `*DAOImpl` и довольно  много объектов `Account` и `User`.
 
 * *Как часто происходит сборка мусора?*
 За время эксперимента произошла 856 раз,  Средняя пауза 1 ms 971 μs, максимальная 103 ms 866 μs
 
 * *Cколько в среднем выполняется запуск сценария 1, как быстро увеличивается это время?*
-На графике времени выполнения сценария 1 практически ничего не изменилось:
-![image](https://user-images.githubusercontent.com/7558836/50046307-9a097300-00b2-11e9-96f1-80db523428ef.png)
+На графике показано среднее время `Execution time average` и текщее время `Execution time last` в секундах зависимости от числа выполнения сценария 1 `Function play_scenario_1 called`. 
+![pyplot](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_1/pyplot.png)
 
 
 * *Какие операции из значимых (т.е. без учета работы системных функций, в т.ч. веб сервера) занимают больше всего процессорного времени?*
-![image](https://user-images.githubusercontent.com/7558836/50046326-c8874e00-00b2-11e9-96f3-721cc196e797.png)
+![hotmethods](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_1/hotmethods.png)
 
 * **ВЫВОДЫ СТАДИИ 1**
 1) Сокращено количество объектов `*DAOImpl` `Account` и `User` в heap'е, что на общую картину потребления памяти практически не повлияло
@@ -140,19 +137,23 @@
 
 
 * *На сколько загружен CPU?*
-В среднем на 12-14%
-![image](https://user-images.githubusercontent.com/7558836/50046359-1ef48c80-00b3-11e9-91f3-c966a7b2eb45.png)
+В среднем около 25%:
+![cpu](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_2/cpu.png)
 
 * *Сколько в среднем потребляется памяти, заметен ли в программе memory leak?*
-![image](https://user-images.githubusercontent.com/7558836/50046364-32075c80-00b3-11e9-8f6a-0e9d698a3575.png)
-Дамп №3:
-![image](https://user-images.githubusercontent.com/7558836/50046372-4cd9d100-00b3-11e9-9499-a82882836ba2.png)
+От 55 Мб до 130Мб:
+![memory](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_2/memory.png)
+
+Дамп №3 
+![dump3](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_2/dump3.png)
 
 * *Как часто происходит сборка мусора?*
 За время эксперимента произошла 1359 раз, средняя пауза 2 ms 458 μs, максимальная 113 ms 650 μs
 
 * *Cколько в среднем выполняется запуск сценария 1, как быстро увеличивается это время?*
-![image](https://user-images.githubusercontent.com/7558836/50046390-a2ae7900-00b3-11e9-8338-f2daef259dcf.png)
+На графике показано среднее время `Execution time average` и текщее время `Execution time last` в секундах зависимости от числа выполнения сценария 1 `Function play_scenario_1 called`. 
+![pyplot](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_2/pyplot.png)
+
 
 * *Какие операции из значимых (т.е. без учета работы системных функций, в т.ч. веб сервера) занимают больше всего процессорного времени?*
-![image](https://user-images.githubusercontent.com/7558836/50046418-de494300-00b3-11e9-9659-16835e196044.png)
+![hotmethods](https://raw.githubusercontent.com/eremeykin/hh-jvm/report/img/stage_2/hotmethods.png)
