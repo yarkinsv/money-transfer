@@ -59,18 +59,17 @@
 
 
 	\subsection*{Стадии экспериментов}
-		Эксперименты проводятся в несколько стадий, каждая стадия отличается от предыдущей изменениями в коде и на каждой стадии снимаются показатели производительности текущей версии кода. Всего есть 4 стадии :
+		Эксперименты проводятся в несколько стадий, каждая стадия отличается от предыдущей изменениями в коде и на каждой стадии снимаются показатели производительности текущей версии кода. Всего есть 3 стадии :
 		\begin{itemize}
 			\item  Стадия 0 (тег \texttt{stage\_0}): код без изменений. На этой стадии выделяются основные ошибки, которые удается найти с помощью профилировщика.
 			\item Стадия 1 (тег \texttt{stage\_1}): код содержит исправления, найденные на предыдущей стадии, а также при инспекции кода
-			\item Стадия 2 (тег \texttt{stage\_2}): реализация DAO переписана, хранение реализовано в структкрах данных Java.
-			\item Стадия 3 (тег \texttt{stage\_3}): анализ различных GC
+			\item Стадия 2 (тег \texttt{stage\_2}): реализация DAO переписана, хранение реализовано на \texttt{HashMap}.
 		\end{itemize}
 
 	\subsection*{Инструменты}
 		Для замеров используются следующие инструменты:
 		\begin{itemize}
-			\item Cамописный bash скрипт \texttt{profile.sh} для автоматизации замеров и обеспечения хотябы небольшой степени воспроизводимости экспериментов.
+			\item Cамописный bash скрипт \texttt{profile.sh} для автоматизации замеров и обеспечения некоторой степени воспроизводимости экспериментов.
 			\item Cамописный python скрипт \texttt{analyze.py} для построения графика времени выполнения сценария 1.
 			\item \href{https://docs.oracle.com/javacomponents/jmc-5-5/jfr-runtime-guide/about.html}{FlightRecorder} для записи \texttt{jfr} файлов с различными измеряемыми параметрами, перечисленными в файле \texttt{flight-recorder.jfc}
 			\item \href{https://www.oracle.com/technetwork/java/javaseproducts/mission-control/index.html}{Java Mission Control} для анализа \texttt{jfr} файлов. Файлы \texttt{jfr} объемные и в репозиторий не входят.
@@ -91,11 +90,11 @@
 	\subsection*{Методика}
 	В \texttt{run\_test.py} добавлен вывод прошедшего с момента запуска времени, этот вывод мы будем перенаправлять в файл \texttt{.plg} (python log) и потом анализировать.
 	На каждой стадии запускаем самописный \texttt{profile.sh} скрипт командой
-	\texttt{./profile.sh --clear \&\& ./profile.sh --dump \&\& sleep 30 \&\& ./profile.sh}
+	\texttt{./profile.sh -{}-clear \&\& ./profile.sh -{}-dump \&\& sleep 30 \&\& ./profile.sh}
 
 		\begin{itemize}
-			\item \texttt{./profile.sh --clear} --- чистит старые дампы и \texttt{jfr} файлы и делает texttt{mvn clean install}
-			\item \texttt{./profile.sh --dump} --- запускает jar-ник и раз в 2 мин делает дамп через texttt{jmap} в течении 10 мин
+			\item \texttt{./profile.sh -{}-clear} --- чистит старые дампы и \texttt{jfr} файлы и делает texttt{mvn clean install}
+			\item \texttt{./profile.sh -{}-dump} --- запускает jar-ник и раз в 2 мин делает дамп через texttt{jmap} в течении 10 мин
 			\item \texttt{./profile.sh} --- записывает \texttt{jfr} файл в течении 10 мин с помощью FlightRecorder и JMC .
 		\end{itemize}
 
@@ -274,6 +273,80 @@
 	\end{itemize}
 	
 
+\section*{Стадия 2}
+
+\begin{enumerate}
+	\item \texttt{9b81cd4} В классе есть \texttt{UserDAOImpl} есть неиспользуемое поле \texttt{fatched} 
+\end{enumerate}		
+
+
+\begin{itemize}
+	
+	\item \textit{На сколько загружен CPU?}
+	
+	Загрузка ЦП уменьшилась до $ \sim12\%  $в среднем.
+	\begin{figure}[h!] % \ContinuedFloat
+		\centering
+		\includegraphics[width=0.95\linewidth]{img/stage_2/cpu.png}
+		
+		\label{fig:cpu2}
+	\end{figure}
+	
+	\item \textit{Сколько в среднем потребляется памяти, заметен ли в программе memory leak?}
+	
+	Использование heap составляет от 50 Мб до 370Мб:
+	\begin{figure}[h!] % \ContinuedFloat
+		\centering
+		\includegraphics[width=0.95\linewidth]{img/stage_2/memory.png}
+		%		\caption{Test}
+		\label{fig:mem2}
+	\end{figure}
+	\newpage
+	
+	Дамп \#3
+	\begin{figure}[h!] % \ContinuedFloat
+		\centering
+		\includegraphics[width=0.75\linewidth]{img/stage_2/dump3.png}
+		%		\caption{Test}
+		\label{fig:dmp32}
+	\end{figure}
+	
+	Судя по дампу объекты создаются и уничтожаются правильно, за исключением \texttt{FastDAOFactory}.
+	
+	\item \textit{Как часто происходит сборка мусора?}
+	
+	За время эксперимента произошла 1144 раз. Средняя пауза 2 ms 545 us, максимальная 102 ms 584 us. 
+	
+	\item \textit{Сколько в среднем выполняется запуск сценария 1, как быстро увеличивается это время?}
+	
+	Текущее время выросло с 0.04 с до  0.57 с за 11200 выполнений сценария 1. 
+	По сравнению с предыдущим этапом, общая производительность немного ниже.
+	
+	\begin{figure}[h!] % \ContinuedFloat
+		\centering
+		\includegraphics[width=0.95\linewidth]{img/stage_2/pyplot.png}
+		\label{fig:pyplot2}
+	\end{figure}
+	
+	\newpage
+	\item \textit{Какие операции из значимых (т.е. без учёта работы системных функций, в т.ч. веб сервера) занимают больше всего процессорного времени?}
+	
+	Чаще всего CPU обрабатывает те же методы, что и на предыдущем этапе.
+	
+	\begin{figure}[h!] % \ContinuedFloat
+		\centering
+		\includegraphics[width=0.95\linewidth]{img/stage_2/hotmethods.png}
+		\label{fig:hotmethods2}
+	\end{figure}
+	
+	\item \textbf{ВЫВОДЫ СТАДИИ 2}
+	\begin{enumerate}
+		\item Изменения позволили снизить загрузку процессора ещё на 3-4\%
+		\item Потребление памяти изменилось незначительно
+		\item Общая производительность ухудшилась на несколько процентов
+		\item in memory СУБД обладает не худшими характеристиками по сравнению с самописным хранилищем на \texttt{HashMap}   
+	\end{enumerate}
+\end{itemize}
 
 
 \end{document}
