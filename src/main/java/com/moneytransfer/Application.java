@@ -10,6 +10,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
@@ -27,6 +28,17 @@ public class Application {
 	private static Logger log = Logger.getLogger(Application.class);
 
 	public static void main(String[] args) throws Exception {
+		// Initialize database with demo data
+		log.info("Initialize demo .....");
+		DAOFactory.setFactoryCode(getFactoryCode(args));
+		DAOFactory DaoFactory = DAOFactory.getDAOFactory();
+		DaoFactory.populateTestData();
+		log.info("Initialisation Complete....");
+		// Host service on jetty
+		startService();
+	}
+
+	private static int getFactoryCode(String[] args) throws ParseException {
 		Options options = new Options();
 		options.addOption("f", true, "Factory code (H2, NoDB, etc), case-insensitive");
 		CommandLineParser parser = new DefaultParser();
@@ -39,14 +51,7 @@ public class Application {
 			else if (factoryCodeString.equalsIgnoreCase("nodb"))
 				factoryCode = DAOFactory.NODB;
 		}
-		// Initialize database with demo data
-		log.info("Initialize demo .....");
-		DAOFactory.setFactoryCode(factoryCode);
-		DAOFactory DaoFactory = DAOFactory.getDAOFactory();
-		DaoFactory.populateTestData();
-		log.info("Initialisation Complete....");
-		// Host service on jetty
-		startService();
+		return factoryCode;
 	}
 
 	private static void startService() throws Exception {
