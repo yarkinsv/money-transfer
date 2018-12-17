@@ -17,21 +17,19 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 public abstract class TestService {
   private static Server server = null;
   private static PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager();
 
   static HttpClient client;
-  private static DAOFactory h2DaoFactory =
-      DAOFactory.getDAOFactory(DAOFactory.H2);
+  private static DAOFactory daoFactory;
   ObjectMapper mapper = new ObjectMapper();
   URIBuilder builder = new URIBuilder().setScheme("http").setHost("localhost:8084");
 
-  @BeforeClass
   public static void setup() throws Exception {
-    h2DaoFactory.populateTestData();
+    daoFactory = DAOFactory.getDAOFactory();
+    daoFactory.populateTestData();
     startServer();
     connManager.setDefaultMaxPerRoute(100);
     connManager.setMaxTotal(200);

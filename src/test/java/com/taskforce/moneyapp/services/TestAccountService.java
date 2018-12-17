@@ -19,7 +19,7 @@ import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertTrue;
 
-public class TestAccountService extends TestService {
+public abstract class TestAccountService extends TestService {
 
   @Test
   public void testGetAccountByUserName() throws IOException, URISyntaxException {

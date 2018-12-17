@@ -5,7 +5,6 @@ import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.User;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -27,11 +26,9 @@ import org.apache.log4j.Logger;
 @Produces(MediaType.APPLICATION_JSON)
 public class UserService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final DAOFactory daoFactory = DAOFactory.getDAOFactory();
 
   private static Logger log = Logger.getLogger(UserService.class);
-
-  private List<User> allUsers = new ArrayList<>();
 
   /**
    * Find by userName
@@ -62,7 +59,6 @@ public class UserService {
   @Path("/all")
   public Response getAllUsers() throws CustomException {
     List<User> users = daoFactory.getUserDAO().getAllUsers();
-    allUsers.addAll(users);
     return Response.ok("[" + users.stream().map(User::toString).collect(Collectors.joining(",")) + "]").build();
   }
 
@@ -80,11 +76,15 @@ public class UserService {
     if (!matcher.find()) {
       throw new WebApplicationException("User email is in wrong pattern", Response.Status.BAD_REQUEST);
     }
-    if (daoFactory.getUserDAO().getUserByName(user.getUserName()) != null) {
-      throw new WebApplicationException("User name already exist", Response.Status.BAD_REQUEST);
+    try {
+      final long uId = daoFactory.getUserDAO().insertUser(user);
+      return daoFactory.getUserDAO().getUserById(uId);
+    } catch (CustomException e) {
+      // Somewhat clumsy, but I don't know better way.
+      if (e.getCause().toString().contains("Unique index or primary key violation"))
+        throw new WebApplicationException("User name already exist", Response.Status.BAD_REQUEST);
+      else throw e;
     }
-    final long uId = daoFactory.getUserDAO().insertUser(user);
-    return daoFactory.getUserDAO().getUserById(uId);
   }
 
   /**
