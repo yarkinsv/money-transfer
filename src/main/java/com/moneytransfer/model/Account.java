@@ -64,7 +64,7 @@ public class Account {
 
   @Override
   public int hashCode() {
-    return 1;
+    return (int) accountId;
   }
 
   @Override

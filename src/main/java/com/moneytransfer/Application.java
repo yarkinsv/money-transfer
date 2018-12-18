@@ -15,6 +15,8 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.glassfish.jersey.servlet.ServletContainer;
 
+import java.net.ServerSocket;
+
 /**
  * Main Class (Starting point) 
  */
@@ -29,13 +31,14 @@ public class Application {
 		h2DaoFactory.populateTestData();
 		log.info("Initialisation Complete....");
 		// Host service on jetty
+		System.out.println("listening on port: " + new ServerSocket(0).getLocalPort());
 		startService();
 	}
 
 	private static void startService() throws Exception {
 		Server server = new Server(new QueuedThreadPool(6, 1));
 		ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory());
-		connector.setPort(8080);
+		connector.setPort(53609);
 		server.addConnector(connector);
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");
