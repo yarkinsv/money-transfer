@@ -39,12 +39,12 @@ public class H2DAOFactory extends DAOFactory {
 
 	public UserDAO getUserDAO() {
 		DbUtils.loadDriver(h2_driver);
-		return new UserDAOImpl();
+		return userDAO;
 	}
 
 	public AccountDAO getAccountDAO() {
 		DbUtils.loadDriver(h2_driver);
-		return new AccountDAOImpl();
+		return accountDAO;
 	}
 
 	@Override

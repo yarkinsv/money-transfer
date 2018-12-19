@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
 
+import java.util.Objects;
+
 public class Account {
 
   private long accountId;
@@ -64,7 +66,7 @@ public class Account {
 
   @Override
   public int hashCode() {
-    return 1;
+    return Objects.hash(accountId, userName, balance, currencyCode);
   }
 
   @Override
