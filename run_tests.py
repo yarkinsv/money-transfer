@@ -96,7 +96,7 @@ def play_scenario_1(user_name):
     print('yangluo money: ' + str(find_account('yangluo')['balance']))
 
 
-for i in range(1000000):
+for i in range(1000):
     play_scenario_1("Mikel" + str(i))
     print_prof_data()
 
