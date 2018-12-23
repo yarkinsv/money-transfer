@@ -64,16 +64,27 @@ public class Account {
 
   @Override
   public int hashCode() {
-    return 1;
+    int result = (int) (accountId ^ (accountId >>> 32));
+    result = 31 * result + userName.hashCode();
+    result = 31 * result + balance.hashCode();
+    result = 31 * result + currencyCode.hashCode();
+    return result;
   }
 
   @Override
   public String toString() {
-    return "{" +
-        "\"accountId\":" + accountId +
-        ", \"userName\":\"" + userName + '\"' +
-        ", \"balance\":" + balance +
-        ", \"currencyCode\":\"" + currencyCode + '\"' +
-        '}';
+    StringBuilder stringBuilder = new StringBuilder("{");
+    stringBuilder.append("\"accountId\":")
+            .append(accountId)
+            .append(", \"userName\":\"")
+            .append(userName)
+            .append('\"')
+            .append(", \"balance\":")
+            .append(balance)
+            .append(", \"currencyCode\":\"")
+            .append(currencyCode)
+            .append('\"')
+            .append('}');
+    return stringBuilder.toString();
   }
 }
