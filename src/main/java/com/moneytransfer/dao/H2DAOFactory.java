@@ -1,7 +1,9 @@
 package com.moneytransfer.dao;
 
 import com.moneytransfer.dao.impl.AccountDAOImpl;
+import com.moneytransfer.dao.impl.AccountDAOImplHashMap;
 import com.moneytransfer.dao.impl.UserDAOImpl;
+import com.moneytransfer.dao.impl.UserDAOImplHashMap;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.utils.Utils;
 
@@ -25,8 +27,11 @@ public class H2DAOFactory extends DAOFactory {
 	private static final String h2_password = Utils.getStringProperty("h2_password");
 	private static Logger log = Logger.getLogger(H2DAOFactory.class);
 
-	private static final UserDAOImpl userDAO = new UserDAOImpl();
-	private static final AccountDAOImpl accountDAO = new AccountDAOImpl();
+	// private static final UserDAOImpl userDAO = new UserDAOImpl();
+	// private static final AccountDAOImpl accountDAO = new AccountDAOImpl();
+
+	private static final UserDAOImplHashMap userDAO = new UserDAOImplHashMap();
+	private static final AccountDAOImplHashMap accountDAO = new AccountDAOImplHashMap();
 
 	static  {
 		// init: load driver
