@@ -61,10 +61,16 @@ public class User {
 
   @Override
   public String toString() {
-    return "{" +
-        "\"userId\":" + userId +
-        ", \"userName\":\"" + userName + '\"' +
-        ", \"emailAddress\":\"" + emailAddress + '\"' +
-        '}';
+    StringBuilder stringBuilder = new StringBuilder("{");
+    stringBuilder.append("\"userId\":")
+            .append(userId)
+            .append(", \"userName\":\"")
+            .append(userName)
+            .append('\"')
+            .append(", \"emailAddress\":\"")
+            .append(emailAddress)
+            .append('\"')
+            .append('}');
+    return stringBuilder.toString();
   }
 }

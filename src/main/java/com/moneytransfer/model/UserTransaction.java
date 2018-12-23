@@ -74,7 +74,17 @@ public class UserTransaction {
 
 	@Override
 	public String toString() {
-		return "{" + "\"currencyCode\":\"" + currencyCode + '\"' + ", \"amount\":" + amount + ", \"fromAccountId\":"
-				+ fromAccountId + ", \"toAccountId\":" + toAccountId + '}';
+		StringBuilder stringBuilder = new StringBuilder("{");
+		stringBuilder.append("\"currencyCode\":\"")
+				.append(currencyCode)
+				.append('\"')
+				.append(", \"amount\":")
+				.append(amount)
+				.append(", \"fromAccountId\":")
+				.append(fromAccountId)
+				.append(", \"toAccountId\":")
+				.append(toAccountId)
+				.append('}');
+		return stringBuilder.toString();
 	}
 }
