@@ -22,7 +22,6 @@ public class UserDAOImpl implements UserDAO {
   private final static String SQL_UPDATE_USER = "UPDATE User SET UserName = ?, EmailAddress = ? WHERE UserId = ? ";
   private final static String SQL_DELETE_USER_BY_ID = "DELETE FROM User WHERE UserId = ? ";
 
-  private List<User> fetched = new ArrayList<>();
 
   /**
    * Find all users
@@ -42,7 +41,6 @@ public class UserDAOImpl implements UserDAO {
         if (log.isDebugEnabled())
           log.debug("getAllUsers() Retrieve User: " + u);
       }
-      fetched.addAll(users);
       return users;
     } catch (SQLException e) {
       throw new CustomException("Error reading user data", e);
