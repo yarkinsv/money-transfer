@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class AccountDAOImpl implements AccountDAO {
 
@@ -103,11 +104,7 @@ public class AccountDAOImpl implements AccountDAO {
           log.debug("Retrieve Account By userId: " + acc);
         }
       }
-      return getAllAccounts()
-          .stream()
-          .filter(account -> account.getUserName().equals(user) && account.getCurrencyCode().equals(currency))
-          .findFirst()
-          .orElse(null);
+      return acc;
     } catch (SQLException e) {
       throw new CustomException("getAccountById(): Error reading account data", e);
     } finally {
