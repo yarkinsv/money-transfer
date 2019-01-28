@@ -15,9 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class AccountDAOImpl implements AccountDAO {
 
@@ -33,11 +31,11 @@ public class AccountDAOImpl implements AccountDAO {
   /**
    * Get all accounts.
    */
-  public Set<Account> getAllAccounts() throws CustomException {
+  public List<Account> getAllAccounts() throws CustomException {
     Connection conn = null;
     PreparedStatement stmt = null;
     ResultSet rs = null;
-    Set<Account> allAccounts = new HashSet<>();
+    List<Account> allAccounts = new ArrayList<>();
     try {
       conn = H2DAOFactory.getConnection();
       stmt = conn.prepareStatement(SQL_GET_ALL_ACC);
