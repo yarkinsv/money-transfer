@@ -10,7 +10,7 @@ import java.util.Set;
 
 public interface AccountDAO {
 
-  List<Account> getAllAccounts() throws CustomException;
+  Set<Account> getAllAccounts() throws CustomException;
 
   Account getAccountById(long accountId) throws CustomException;
 

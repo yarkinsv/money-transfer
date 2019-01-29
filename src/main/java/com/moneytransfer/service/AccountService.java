@@ -37,7 +37,7 @@ public class AccountService {
   @GET
   @Path("/all")
   public Response getAllAccounts() throws CustomException {
-    List<Account> account = daoFactory.getAccountDAO().getAllAccounts();
+    Set<Account> account = daoFactory.getAccountDAO().getAllAccounts();
     return Response.ok("[" + account.stream().map(Account::toString).collect(Collectors.joining(",")) + "]").build();
   }
 
