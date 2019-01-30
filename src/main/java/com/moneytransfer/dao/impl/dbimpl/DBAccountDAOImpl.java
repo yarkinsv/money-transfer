@@ -1,4 +1,4 @@
-package com.moneytransfer.dao.impl;
+package com.moneytransfer.dao.impl.dbimpl;
 
 import com.moneytransfer.dao.AccountDAO;
 import com.moneytransfer.dao.H2DAOFactory;
@@ -17,9 +17,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class AccountDAOImpl implements AccountDAO {
+public class DBAccountDAOImpl implements AccountDAO {
 
-  private static Logger log = Logger.getLogger(AccountDAOImpl.class);
+  private static Logger log = Logger.getLogger(DBAccountDAOImpl.class);
   private final static String SQL_GET_ACC_BY_ID = "SELECT * FROM Account WHERE AccountId = ? ";
   private final static String SQL_GET_ACC_BY_USER_ID = "SELECT * FROM Account WHERE UserName = ? AND CurrencyCode = ?";
   private final static String SQL_LOCK_ACC_BY_ID = "SELECT * FROM Account WHERE AccountId = ? FOR UPDATE";

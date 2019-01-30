@@ -1,4 +1,4 @@
-package com.moneytransfer.dao.impl;
+package com.moneytransfer.dao.impl.dbimpl;
 
 import com.moneytransfer.dao.H2DAOFactory;
 import com.moneytransfer.dao.UserDAO;
@@ -12,9 +12,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDAOImpl implements UserDAO {
+public class DBUserDAOImpl implements UserDAO {
 
-  private static Logger log = Logger.getLogger(UserDAOImpl.class);
+  private static Logger log = Logger.getLogger(DBUserDAOImpl.class);
   private final static String SQL_GET_USER_BY_ID = "SELECT * FROM User WHERE UserId = ? ";
   private final static String SQL_GET_ALL_USERS = "SELECT * FROM User";
   private final static String SQL_GET_USER_BY_NAME = "SELECT * FROM User WHERE UserName = ? ";
