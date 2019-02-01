@@ -38,6 +38,14 @@ public class User {
     return emailAddress;
   }
 
+  public void setUserName(String userName) {
+    this.userName = userName;
+  }
+
+  public void setEmailAddress(String emailAddress) {
+    this.emailAddress = emailAddress;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;

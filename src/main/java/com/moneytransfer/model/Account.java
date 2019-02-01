@@ -17,8 +17,7 @@ public class Account {
   @JsonProperty(required = true)
   private String currencyCode;
 
-  public Account() {
-  }
+  public Account() {}
 
   public Account(String userName, BigDecimal balance, String currencyCode) {
     this.userName = userName;
@@ -47,6 +46,10 @@ public class Account {
 
   public String getCurrencyCode() {
     return currencyCode;
+  }
+
+  public void setBalance(BigDecimal balance) {
+    this.balance = balance;
   }
 
   @Override

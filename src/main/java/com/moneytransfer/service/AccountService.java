@@ -24,7 +24,7 @@ import java.util.Set;
 @Consumes(MediaType.APPLICATION_JSON)
 public class AccountService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.HASH);
 
   private static Logger log = Logger.getLogger(AccountService.class);
 
