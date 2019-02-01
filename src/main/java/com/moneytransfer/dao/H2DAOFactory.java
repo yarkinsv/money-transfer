@@ -1,7 +1,7 @@
 package com.moneytransfer.dao;
 
-import com.moneytransfer.dao.impl.AccountDAOImpl;
-import com.moneytransfer.dao.impl.UserDAOImpl;
+import com.moneytransfer.dao.impl.dbimpl.DBAccountDAOImpl;
+import com.moneytransfer.dao.impl.dbimpl.DBUserDAOImpl;
 import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.utils.Utils;
 
@@ -25,8 +25,8 @@ public class H2DAOFactory extends DAOFactory {
 	private static final String h2_password = Utils.getStringProperty("h2_password");
 	private static Logger log = Logger.getLogger(H2DAOFactory.class);
 
-	private static final UserDAOImpl userDAO = new UserDAOImpl();
-	private static final AccountDAOImpl accountDAO = new AccountDAOImpl();
+	private static final DBUserDAOImpl userDAO = new DBUserDAOImpl();
+	private static final DBAccountDAOImpl accountDAO = new DBAccountDAOImpl();
 
 	static  {
 		// init: load driver
@@ -39,12 +39,12 @@ public class H2DAOFactory extends DAOFactory {
 
 	public UserDAO getUserDAO() {
 		DbUtils.loadDriver(h2_driver);
-		return new UserDAOImpl();
+		return new DBUserDAOImpl();
 	}
 
 	public AccountDAO getAccountDAO() {
 		DbUtils.loadDriver(h2_driver);
-		return new AccountDAOImpl();
+		return new DBAccountDAOImpl();
 	}
 
 	@Override

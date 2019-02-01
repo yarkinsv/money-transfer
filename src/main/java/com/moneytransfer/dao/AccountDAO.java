@@ -5,6 +5,7 @@ import com.moneytransfer.model.Account;
 import com.moneytransfer.model.UserTransaction;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 public interface AccountDAO {

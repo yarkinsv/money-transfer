@@ -17,8 +17,7 @@ public class Account {
   @JsonProperty(required = true)
   private String currencyCode;
 
-  public Account() {
-  }
+  public Account() {}
 
   public Account(String userName, BigDecimal balance, String currencyCode) {
     this.userName = userName;
@@ -49,6 +48,10 @@ public class Account {
     return currencyCode;
   }
 
+  public void setBalance(BigDecimal balance) {
+    this.balance = balance;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -64,7 +67,11 @@ public class Account {
 
   @Override
   public int hashCode() {
-    return 1;
+    int result = (int) (accountId ^ (accountId >>> 32));
+    result = 31 * result + userName.hashCode();
+    result = 31 * result + balance.hashCode();
+    result = 31 * result + currencyCode.hashCode();
+    return result;
   }
 
   @Override

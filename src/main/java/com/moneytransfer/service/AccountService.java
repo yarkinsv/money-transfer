@@ -5,6 +5,7 @@ import com.moneytransfer.exception.CustomException;
 import com.moneytransfer.model.Account;
 import com.moneytransfer.model.MoneyUtil;
 
+import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 
@@ -23,7 +24,7 @@ import java.util.Set;
 @Consumes(MediaType.APPLICATION_JSON)
 public class AccountService {
 
-  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.H2);
+  private final DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.HASH);
 
   private static Logger log = Logger.getLogger(AccountService.class);
 

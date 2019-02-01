@@ -18,8 +18,7 @@ public class UserTransaction {
 	@JsonProperty(required = true)
 	private Long toAccountId;
 
-	public UserTransaction() {
-	}
+	public UserTransaction() {}
 
 	public UserTransaction(String currencyCode, BigDecimal amount, Long fromAccountId, Long toAccountId) {
 		this.currencyCode = currencyCode;
