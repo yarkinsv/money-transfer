@@ -64,7 +64,10 @@ public class Account {
 
   @Override
   public int hashCode() {
-    return 1;
+    int result = userName.hashCode();
+    result = 31 * result + balance.hashCode();
+    result = 31 * result + currencyCode.hashCode();
+    return result;
   }
 
   @Override
