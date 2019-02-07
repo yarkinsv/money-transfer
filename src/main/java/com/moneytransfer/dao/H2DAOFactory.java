@@ -25,9 +25,6 @@ public class H2DAOFactory extends DAOFactory {
 	private static final String h2_password = Utils.getStringProperty("h2_password");
 	private static Logger log = Logger.getLogger(H2DAOFactory.class);
 
-	private static final UserDAOImpl userDAO = new UserDAOImpl();
-	private static final AccountDAOImpl accountDAO = new AccountDAOImpl();
-
 	static  {
 		// init: load driver
 		DbUtils.loadDriver(h2_driver);
@@ -38,12 +35,10 @@ public class H2DAOFactory extends DAOFactory {
 	}
 
 	public UserDAO getUserDAO() {
-		DbUtils.loadDriver(h2_driver);
 		return new UserDAOImpl();
 	}
 
 	public AccountDAO getAccountDAO() {
-		DbUtils.loadDriver(h2_driver);
 		return new AccountDAOImpl();
 	}
 
